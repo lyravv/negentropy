@@ -1,0 +1,126 @@
+# negentropy 团队清单（机器可读）
+# 这是团队的"DNA"：任何编排引擎（或人）解析此文件即可知道团队构成与流水线。
+# 约定：
+#   - role id 用英文 kebab-case（文件系统安全、跨平台可移植）
+#   - 路径均相对仓库根目录
+#   - 修改本文件属于"团队结构性变更"，必须同步 evolution/CHANGELOG.md
+
+team:
+  name: negentropy
+  version: 0.1.0
+  description: 以文档为协作介质、以 git 为单一事实源的软件开发团队
+  protocol: v1-docs            # 当前生效的协作协议，见 team/protocols/CURRENT.md
+  language: zh-CN              # 文档默认语言
+
+roles:
+  - id: business-liaison
+    name: 业务对接员
+    entropy: 业务熵
+    stage: 1
+    dir: team/roles/business-liaison
+    charter: team/roles/business-liaison/AGENT.md
+    skills: team/roles/business-liaison/skills.md
+    mission: 澄清业务背景、术语、流程及外部依赖
+    outputs:
+      - 01-business/business-brief.md
+      - 01-business/glossary.md
+
+  - id: product-manager
+    name: 产品经理
+    entropy: 需求熵
+    stage: 2
+    dir: team/roles/product-manager
+    charter: team/roles/product-manager/AGENT.md
+    skills: team/roles/product-manager/skills.md
+    mission: 整理需求、用户故事、验收标准和迭代计划
+    outputs:
+      - 02-requirements/requirements.md
+      - 02-requirements/user-stories/
+      - 02-requirements/iteration-plan.md
+
+  - id: architect
+    name: 架构工程师
+    entropy: 设计熵
+    stage: 3
+    dir: team/roles/architect
+    charter: team/roles/architect/AGENT.md
+    skills: team/roles/architect/skills.md
+    mission: 技术选型、系统设计、接口和数据模型
+    outputs:
+      - 03-architecture/architecture.md
+      - 03-architecture/api-spec.md
+      - 03-architecture/data-model.md
+
+  - id: frontend-engineer
+    name: 前端工程师
+    entropy: 实现熵(界面)
+    stage: 4
+    parallel_group: implementation
+    dir: team/roles/frontend-engineer
+    charter: team/roles/frontend-engineer/AGENT.md
+    skills: team/roles/frontend-engineer/skills.md
+    mission: 界面、交互与前端测试
+    outputs:
+      - 04-implementation/frontend-notes.md
+
+  - id: backend-engineer
+    name: 后端工程师
+    entropy: 实现熵(服务)
+    stage: 4
+    parallel_group: implementation
+    dir: team/roles/backend-engineer
+    charter: team/roles/backend-engineer/AGENT.md
+    skills: team/roles/backend-engineer/skills.md
+    mission: 服务、数据库、权限和接口
+    outputs:
+      - 04-implementation/backend-notes.md
+
+  - id: test-engineer
+    name: 测试工程师
+    entropy: 质量熵
+    stage: 5
+    dir: team/roles/test-engineer
+    charter: team/roles/test-engineer/AGENT.md
+    skills: team/roles/test-engineer/skills.md
+    mission: 测试方案、自动化测试、缺陷与回归
+    outputs:
+      - 05-testing/test-plan.md
+      - 05-testing/defect-log.md
+      - 05-testing/test-report.md
+
+  - id: devops-engineer
+    name: 运维工程师
+    entropy: 运维熵
+    stage: 6
+    dir: team/roles/devops-engineer
+    charter: team/roles/devops-engineer/AGENT.md
+    skills: team/roles/devops-engineer/skills.md
+    mission: 环境、部署、监控、备份和发布
+    outputs:
+      - 06-ops/deployment.md
+      - 06-ops/release-notes.md
+
+workflow:
+  file: team/workflow.md
+  stages:
+    - { id: intake,        stage: 0, owner: orchestrator,        desc: 立项、建项目工作区 }
+    - { id: business,      stage: 1, owner: business-liaison,    desc: 业务澄清 }
+    - { id: requirements,  stage: 2, owner: product-manager,     desc: 需求与用户故事 }
+    - { id: architecture,  stage: 3, owner: architect,           desc: 架构与接口设计 }
+    - { id: implementation, stage: 4, owner: [frontend-engineer, backend-engineer], parallel: true, desc: 前后端并行实现 }
+    - { id: testing,       stage: 5, owner: test-engineer,       desc: 测试与缺陷回归 }
+    - { id: release,       stage: 6, owner: devops-engineer,     desc: 部署与发布 }
+    - { id: retrospective, stage: 7, owner: orchestrator,        desc: 复盘，回写 skills.md }
+
+  # 反馈回路：下游可把问题打回上游
+  feedback_loops:
+    - { from: architect,         to: product-manager,    trigger: 需求不可实现/歧义 }
+    - { from: test-engineer,     to: backend-engineer,   trigger: 缺陷 }
+    - { from: test-engineer,     to: frontend-engineer,  trigger: 缺陷 }
+    - { from: devops-engineer,   to: backend-engineer,   trigger: 部署阻塞 }
+    - { from: product-manager,   to: business-liaison,   trigger: 业务背景不足 }
+
+project_template: projects/_template
+evolution:
+  changelog: evolution/CHANGELOG.md
+  roadmap: evolution/roadmap.md

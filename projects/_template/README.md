@@ -1,0 +1,26 @@
+# 项目工作区模板（_template）
+
+> 开新项目时：`cp -r projects/_template projects/<project-name>`，然后删掉本文件。
+> 本目录是项目工作区的骨架，阶段目录按 `team/workflow.md` 编号。
+
+## 目录约定
+```
+<project-name>/
+├── README.md              # 项目说明（本文件，开项目后改写）
+├── open-questions.md      # 全局未决问题/变更登记簿（从模板复制）
+├── 00-intake/
+│   └── project-brief.md   # 立项简报（编排者填）
+├── 01-business/           # business-liaison 产出
+├── 02-requirements/       # product-manager 产出（含 user-stories/）
+├── 03-architecture/       # architect 产出
+├── 04-implementation/     # frontend ∥ backend 产出（代码另放，notes 在此）
+├── 05-testing/            # test-engineer 产出
+├── 06-ops/                # devops-engineer 产出
+└── 07-retro/              # 复盘
+```
+
+## 项目信息
+- 项目名：<project-name>
+- 启动日期：YYYY-MM-DD
+- 当前阶段：<stage>
+- 状态：DRAFT / IN_REVIEW / APPROVED / DONE / BLOCKED
