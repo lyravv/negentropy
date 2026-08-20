@@ -49,8 +49,9 @@ negentropy/
 │   │   └── v2-tools.md        # 规划：yapi / jira 集成
 │   ├── templates/             # 各交付物的文档模板
 │   └── orchestration.md       # 如何用 sub-agent 实际跑起这个团队
-├── projects/                  # 每个项目一个工作区
-│   └── _template/             # 项目骨架（开新项目时复制）
+├── projects/                  # 每个项目一个工作区（根目录必有 STATE.md = 续接入口）
+│   ├── graphx/                # GraphX 项目（STATE.md 见其根目录）
+│   └── _template/             # 项目骨架（开新项目时复制，含 STATE.md 模板）
 ├── evolution/                 # 团队演进
 │   ├── CHANGELOG.md           # 团队变更日志
 │   └── roadmap.md             # 规划中的升级
@@ -63,6 +64,20 @@ negentropy/
 2. 按 [`team/workflow.md`](team/workflow.md) 的阶段推进，每个阶段由对应角色产出文档
 3. 用 [`team/orchestration.md`](team/orchestration.md) 中的方法，把每个阶段派给对应角色的 sub-agent
 4. 项目结束后做复盘，把学到的东西写回各角色的 `skills.md`，并在 `evolution/CHANGELOG.md` 记一笔
+
+## 如何"继续"一个已有项目（Continue）
+
+> **这是跨 agent 互通的关键入口。** 任何 agent 收到
+> 「使用 `/home/wangling/develop_team/negentropy` 定义的多agent角色，继续 `<project>` 的开发工作」
+> 这类**只有一句话、不带进度/背景**的指令时，**直接读 `projects/<project>/STATE.md`**。
+
+`STATE.md` 是该项目的**单一"当前状态 + 下一步"入口**，由编排者每轮收尾时更新，包含：
+代码仓库位置、规范事实源、当前所处阶段、**精确的下一步动作**、关键约束、以及完整的
+**Bootstrap 顺序**（新 agent 照此逐步执行即可接手，无需额外上下文）。
+
+- 现有项目：`projects/graphx/STATE.md`（GraphX，Graph-first 超图工作台）。
+- 约定：每个项目工作区根目录**必须**有 `STATE.md`；编排者每轮收尾必须更新它（见
+  `team/orchestration.md` 的"继续一个已有项目"）。没有 `STATE.md` 的项目视为未建立可续接状态。
 
 ## 如何"入队"（对任何 agent 框架）
 

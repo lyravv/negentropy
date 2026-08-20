@@ -2,8 +2,8 @@
 title: 未决问题与变更请求
 role: orchestrator(维护) / 全员(提出)
 status: DRAFT
-version: 0.1
-updated: YYYY-MM-DD
+version: 0.2
+updated: 2026-08-20
 upstream: []
 downstream: [全员]
 ---

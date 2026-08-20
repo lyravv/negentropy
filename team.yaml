@@ -7,7 +7,7 @@
 
 team:
   name: negentropy
-  version: 0.1.0
+  version: 0.2.0
   description: 以文档为协作介质、以 git 为单一事实源的软件开发团队
   protocol: v1-docs            # 当前生效的协作协议，见 team/protocols/CURRENT.md
   language: zh-CN              # 文档默认语言

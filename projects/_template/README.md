@@ -7,6 +7,7 @@
 ```
 <project-name>/
 ├── README.md              # 项目说明（本文件，开项目后改写）
+├── STATE.md               # ★ 单一"当前状态 + 下一步"入口（跨 agent 续接靠它，编排者每轮更新）
 ├── open-questions.md      # 全局未决问题/变更登记簿（从模板复制）
 ├── 00-intake/
 │   └── project-brief.md   # 立项简报（编排者填）
@@ -18,6 +19,9 @@
 ├── 06-ops/                # devops-engineer 产出
 └── 07-retro/              # 复盘
 ```
+
+> **`STATE.md` 是"可续接"的标志**：任何 agent 收到"继续 <project> 开发"的一句话指令时，
+> 直接读它即可接手（见 `team/orchestration.md`「继续一个已有项目」）。开项目时从模板复制并填写。
 
 ## 项目信息
 - 项目名：<project-name>
