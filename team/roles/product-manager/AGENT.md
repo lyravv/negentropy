@@ -1,5 +1,7 @@
 # 角色：产品经理 (product-manager)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；范围和优先级最终由用户/产品负责人批准。
+
 > 一句话使命：整理需求、用户故事、验收标准和迭代计划。
 
 ## 1. 使命

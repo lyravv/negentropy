@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [00-intake/project-brief.md]
 downstream: [product-manager]
+artifact_type: business-rules
+source_revision: N/A
+reviewers: [product-manager]
+approver: business-owner
+approval_evidence:
 ---
 
 # 业务简报

@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [01-business/business-brief.md, 01-business/glossary.md]
 downstream: [architect]
+artifact_type: requirements
+source_revision: N/A
+reviewers: [architect, test-engineer]
+approver: product-owner
+approval_evidence:
 ---
 
 # 需求文档

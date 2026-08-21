@@ -32,6 +32,16 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，新特性生效需重启/重新部署，见阶段 6） |
 | 下一步 | 静态套件绑定已交付（GX-TEST-001）；剩余：① 关闭 Q-002/OQ-016 凭据隔离门禁（Builder 实跑前置）② 用已绑定套件执行 30 条盲评并冻结 Tester 输出 |
 
+## 项目批准者
+
+| Principal | 实际负责人/稳定 ID | 说明 |
+|---|---|---|
+| project-owner | user | 范围、残余风险和发布授权 |
+| product-owner | user | GraphX 产品行为与优先级 |
+| business-owner | user | 业务语义与材料使用边界 |
+
+> 批准者不可用时保持 BLOCKED 并请求决定；等待时间不自动转换为授权。
+
 ## 当前状态（按 `team/workflow.md` 阶段）
 
 | 阶段 | 负责角色 | 状态 | 说明 |

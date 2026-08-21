@@ -1,115 +1,54 @@
 # 编排指南（Orchestration）
 
-> 本文件回答：**如何用一个主 agent（编排者）+ 多个角色 sub-agent 实际跑起 negentropy 团队。**
-> 适用于任何支持 sub-agent 的 agent 框架（DSH、Claude Code 等）。核心思想：**编排者只负责路由与把关，角色 sub-agent 负责产出。**
+编排者是 control plane，不是全领域批准者。先遵循 `philosophy.md` 的最低充分秩序；完整职责见 `roles/orchestrator/AGENT.md`，权限见 `governance.md`，并发见 `concurrency.md`。
 
-## 角色分工
+## 接手顺序
 
-- **编排者（orchestrator）= 主 agent**：
-  - 不亲自写业务文档，只负责：立项、按 `workflow.md` 推进阶段、把任务派给正确的角色 sub-agent、评审产出、路由 handoff、管理 `open-questions`、主持复盘。
-  - 是**唯一**能改 `team/` 和 `evolution/` 的角色（团队自身演进）。
-- **角色 sub-agent**：每次按需启动，扮演一个角色，读章程 + 上游文档，产出本角色文档，然后结束。
+1. 读项目 `STATE.md`，确认 profile、权威来源、revision、下一步和基线。
+2. 读 `WORKBOARD.md`，识别活动 lease、冲突范围和可认领项。
+3. 读团队哲学、当前协议、治理、并发规则和项目代码仓 `AGENTS.md`。
+4. 检查所有相关仓库 worktree；保留已有修改。
+5. 运行团队校验；再按项目风险决定是否运行基线测试。
+6. 写任务先认领，读任务可直接执行；按角色章程派活。
 
-## 继续一个已有项目（Resume / 跨 agent 互通）
+## 标准派活 Prompt
 
-> 团队不仅支持"从零立项"，也支持**任意 agent 在任意时刻接手继续**。
-> **交接/续接机制（Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定）是团队能力，
-> 单一事实源在 [`team/handoff.md`](handoff.md)。** 本节只给入口，不重复流程。
-
-- **触发**：收到「使用 negentropy 定义的多agent角色，继续 `<project>` 的开发工作」这类
-  **只有一句话、不带进度/背景**的指令。
-- **入口**：读 `projects/<project>/STATE.md`（项目内容：在哪 + 下一步 + 项目专属约束 + 基线命令），
-  再按 `team/handoff.md` §2 Bootstrap 顺序接手、§3 收尾清单收尾。
-- **约定**：每个项目工作区根目录**必须**有 `STATE.md`（"可续接"的标志）；它只放**项目内容**，
-  流程与团队级约束指向 `team/handoff.md`，不重复。角色 sub-agent 只需：章程 + 技能 + 协议 +
-  上游 APPROVED 文档 + `STATE.md` 指派的本次任务。
-
-## 派活的标准 Prompt 结构
-
-给某个角色 sub-agent 的任务提示，固定包含以下部分（编排者照此拼装）：
-
-```
-【角色】你是 negentropy 团队的 <角色名>（<role-id>）。
-【章程】先完整阅读并遵守：<repo>/team/roles/<role-id>/AGENT.md
-【技能】再阅读你的技能与偏好：<repo>/team/roles/<role-id>/skills.md
-【协议】遵守协作协议：<repo>/team/protocols/<CURRENT 指向的版本>.md
-【项目】项目工作区：<repo>/projects/<project>/
-【输入】你的上游输入（已 APPROVED）：<列出文档路径>
-【任务】<本次具体要做什么，对应 workflow.md 的哪个阶段>
-【产出】把结果写到：<目标文档路径>，文档头部按协议填好 status/version/upstream/downstream，
-       正文开头写"交接说明"块。
-【边界】只产出你职责内的文档；发现问题写 open-questions.md 并打回，不要擅自改上游文档。
-【完成标准】满足 AGENT.md 中本阶段的 Definition of Done 后，汇报产出路径与关键决策。
+```text
+【角色】negentropy/<role-id>；完整阅读该角色 AGENT.md、skills.md 与当前协议。
+【项目】<workspace>；profile=<profile>；STATE/WORKBOARD=<paths>。
+【授权】action_mode=<mode>；授权来源=<user request/project policy>。
+【基线】base_revision=<sha|WORKTREE>；当前 worktree=<clean|列出需保护的修改>。
+【输入】只列权威输入及精确 revision；说明哪些阶段由 existing spec 替代。
+【任务】一个可验收目标。
+【范围】允许写入文件/目录；明确禁止范围；与其他工作项的依赖。
+【产出】目标文件、状态、审批者、交接字段。
+【验证】必须运行的 scoped 命令；全量命令由集成者运行。
+【完成】更新工作项结果；报告 revision/WORKTREE、验证、风险；不默认 commit/push/deploy。
 ```
 
-## 阶段驱动（对应 workflow.md）
+## 编排循环
 
-```
-编排者
-  │  阶段0 立项：建项目工作区，写 project-brief.md
-  ▼
-启动 business-liaison sub-agent  → 产出 01-business/*
-  │  编排者评审 → APPROVED
-  ▼
-启动 product-manager sub-agent   → 产出 02-requirements/*
-  │  评审 → APPROVED
-  ▼
-启动 architect sub-agent         → 产出 03-architecture/*
-  │  评审 → APPROVED
-  ▼
-并行启动 frontend-engineer ∥ backend-engineer sub-agent  → 代码 + 04-implementation/*
-  │  两者都完成 → 评审
-  ▼
-启动 test-engineer sub-agent     → 产出 05-testing/*
-  │  有缺陷 → 打回对应实现角色（可多轮）
-  │  无阻塞缺陷 → APPROVED
-  ▼
-启动 devops-engineer sub-agent   → 产出 06-ops/*
-  ▼
-编排者主持复盘 → 07-retro/* + 回写 skills.md + evolution/CHANGELOG.md
-```
+1. **分类**：确定 action mode 和 workflow profile。
+2. **盘点**：读取权威事实、检查 worktree 和活动任务。
+3. **拆分**：按契约和文件所有权拆成无重叠工作项，写依赖图。
+4. **认领**：记录 owner、base、scope、lease、验收；然后启动角色。
+5. **评审**：内容由治理矩阵中的 reviewer/approver 处理；orchestrator 检查证据。
+6. **集成**：核对 revision，运行 scoped + baseline 验证，处理冲突。
+7. **交接**：更新 WORKBOARD 与 STATE；只有 publish 授权才执行外部副作用。
 
-## 并行与反馈
+## 并行判定
 
-- **并行**：阶段 4 的前后端 sub-agent **同时启动**（互不依赖，以 `api-spec.md` 为契约）。
-  其他阶段默认串行（下游依赖上游 APPROVED）。
-- **反馈回路**：下游 sub-agent 发现问题时，不直接改上游，而是写 `open-questions.md` 并汇报给编排者；
-  编排者据此**重新启动**上游角色 sub-agent 做修订。
-- **多轮**：测试→修复→回归可能多轮，每轮都是"启动实现角色 sub-agent 修缺陷 → 启动测试角色 sub-agent 回归"。
+满足以下全部条件才并行：写入集合不重叠；没有未决契约；共享输入 revision 相同；任务间无产出依赖；集成责任人明确。否则串行。首次实现与后续修复都遵循同一规则，不能仅因角色不同就假定安全。
 
-## 评审（编排者的把关）
+## 评审门禁
 
-编排者收到角色产出后，按该角色 `AGENT.md` 的"质量标准"检查：
-- 文档头部字段齐全、状态正确？
-- 交接说明块清晰？
-- 是否满足 Definition of Done？
-- 是否越界（改了不该改的文档）？
-- 未决问题是否都进了 `open-questions.md`？
+- frontmatter 与状态类型正确；
+- approver 符合治理矩阵且 evidence 可追溯；
+- source revision 与实际工作一致；
+- DoR/DoD、契约覆盖和未决项完整；
+- 不越权、不覆盖用户修改、不扩大外部副作用；
+- 测试结论对应被测 revision，而非旧报告数字。
 
-不达标 → 打回该角色 sub-agent 重做（附上具体问题）；达标 → 置 `APPROVED`，进入下一阶段。
+## 兼任角色
 
-## 上下文管理（重要）
-
-- 角色 sub-agent **不需要**看到整个项目历史，只需要：章程 + 技能 + 协议 + 上游 APPROVED 文档 + 本次任务。
-  这样每个 sub-agent 上下文小、专注、可并行。
-- 编排者维护全局视图（哪些文档什么状态、有哪些 open questions），是团队的"记忆中枢"。
-- 若框架支持，优先用**继承上下文的 fork** 给需要"接着上次改"的角色（如缺陷修复轮），
-  用**全新 sub-agent** 给首次执行某阶段的角色。
-
-## 一次最小完整运行（示例）
-
-```
-1. 编排者：cp -r projects/_template projects/demo-api；写 project-brief.md（APPROVED）
-2. 编排者 → business-liaison：产出 business-brief.md + glossary.md
-3. 编排者评审 → APPROVED
-4. 编排者 → product-manager：产出 requirements.md + user-stories/ + iteration-plan.md
-5. 编排者评审 → APPROVED
-6. 编排者 → architect：产出 architecture.md + api-spec.md + data-model.md
-7. 编排者评审 → APPROVED
-8. 编排者 → [frontend ∥ backend]：实现 + 各自 notes
-9. 编排者评审 → APPROVED
-10. 编排者 → test-engineer：test-plan + 执行 + defect-log + test-report
-11. （若有缺陷）编排者 → 对应实现角色修复 → 回到 10 回归
-12. 编排者 → devops-engineer：deployment.md + release-notes.md
-13. 编排者：复盘，回写 skills.md，记 evolution/CHANGELOG.md
-```
+无法或无需启动独立角色时，主 agent 可以兼任，但 WORKBOARD 的 owner 写 `orchestrator as <role>`，审批仍遵循职责分离；高风险变更不能由同一身份同时作者、唯一 reviewer 和业务/发布批准者。

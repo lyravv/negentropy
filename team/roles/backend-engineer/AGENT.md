@@ -1,5 +1,7 @@
 # 角色：后端工程师 (backend-engineer)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；实现授权不自动包含 commit、push 或部署。
+
 > 一句话使命：服务、数据库、权限和接口
 
 ## 1. 使命

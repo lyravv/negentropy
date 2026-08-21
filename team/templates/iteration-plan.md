@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [02-requirements/requirements.md]
 downstream: [architect, orchestrator]
+artifact_type: requirements
+source_revision: N/A
+reviewers: [architect, test-engineer]
+approver: product-owner
+approval_evidence:
 ---
 
 # 迭代计划

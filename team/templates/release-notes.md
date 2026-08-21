@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [06-ops/deployment.md, 05-testing/test-report.md]
 downstream: [orchestrator]
+artifact_type: production-release
+source_revision: N/A
+reviewers: [test-engineer, orchestrator]
+approver: project-owner
+approval_evidence:
 ---
 
 # 发布说明（Release Notes）

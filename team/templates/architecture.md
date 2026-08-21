@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [02-requirements/requirements.md, 02-requirements/iteration-plan.md]
 downstream: [frontend-engineer, backend-engineer, test-engineer, devops-engineer]
+artifact_type: architecture
+source_revision: N/A
+reviewers: [frontend-engineer, backend-engineer, test-engineer, devops-engineer]
+approver: architect
+approval_evidence:
 ---
 
 # 架构设计

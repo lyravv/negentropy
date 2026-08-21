@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: []
 downstream: [business-liaison]
+artifact_type: project-brief
+source_revision: N/A
+reviewers: [business-liaison, product-manager]
+approver: project-owner
+approval_evidence:
 ---
 
 # 项目立项简报

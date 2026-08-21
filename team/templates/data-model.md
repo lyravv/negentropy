@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [03-architecture/architecture.md]
 downstream: [backend-engineer, test-engineer]
+artifact_type: data-contract
+source_revision: N/A
+reviewers: [backend-engineer, test-engineer]
+approver: architect
+approval_evidence:
 ---
 
 # 数据模型

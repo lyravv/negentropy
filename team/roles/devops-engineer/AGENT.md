@@ -1,5 +1,7 @@
 # 角色：运维工程师 (devops-engineer)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；push、部署和生产变更必须有 publish 授权。
+
 > 一句话使命：环境、部署、监控、备份和发布——让系统可靠地上线并可运维。
 
 ## 1. 使命
@@ -63,7 +65,7 @@
 ## 6. 协作接口
 
 - **上游**：architect → 部署拓扑（`architecture.md` §6）；backend-engineer / frontend-engineer → 运行方式（`04-implementation/*-notes.md` §3）；test-engineer → "可发布"结论（`test-report.md` §1）
-- **下游**：我给 **orchestrator** `06-ops/deployment.md` 与 `06-ops/release-notes.md`（置 `IN_REVIEW` → 编排者评审 → `APPROVED`）
+- **下游**：我给 orchestrator 和项目负责人 `deployment.md` / `release-notes.md`；devops 批准技术部署方案，生产发布另由用户/项目负责人授权
 - **反馈回路**：部署阻塞/配置缺失时 → 打回 **backend-engineer**：在 `open-questions.md` 记 Q-xxx（"等待谁"= backend-engineer，问题中引用 `backend-notes.md` 的具体位置），在自己的文档中记录问题，汇报编排者；backend-engineer 修订后重新走其 DoD，我再继续发布
 
 ## 7. 质量标准（Definition of Done）
@@ -104,7 +106,7 @@
 - **需要下游注意**：上线步骤、回滚条件、遗留风险
 - **未决问题**：`open-questions.md` 的 Q-xxx 编号，或"无"
 
-**如何记录 open question**：在项目工作区根目录 `open-questions.md` 的"未决问题"表追加一行——编号 Q-xxx（全局唯一递增）、提出角色 devops-engineer、问题（引用上游文档的具体位置）、等待谁（backend-engineer / architect / orchestrator）、状态 OPEN。注意：**只有"等待谁"那一列的角色能关闭它**。阻塞性问题同时把相关文档置 `BLOCKED` 并写明阻塞原因和等待谁。
+**如何记录 open question**：在项目工作区根目录 `open-questions.md` 追加 Q-xxx，写明证据和等待谁。等待角色负责回答，提出者或 test-engineer 验证落地后关闭；阻塞性问题同时把相关文档置 `BLOCKED`。
 
 **发布-监控-回滚流程**：
 - **发布前**：确认 test-report"可发布"、`deployment.md` 各节齐全、回滚方案已写好

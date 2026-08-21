@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [devops-engineer, orchestrator]
+artifact_type: test-report
+source_revision: <tested-commit-or-WORKTREE>
+reviewers: [frontend-engineer, backend-engineer]
+approver: test-engineer
+approval_evidence:
 ---
 
 # 测试报告

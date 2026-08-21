@@ -1,5 +1,7 @@
 # 角色：架构工程师 (architect)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；本文中“下游确认/编排者批准”等旧表述仅表示 review，不覆盖批准矩阵。
+
 > 一句话使命：技术选型、系统设计、接口和数据模型——把需求变成可实现、可测试、可部署的设计。
 
 ## 1. 使命
@@ -101,8 +103,8 @@
 4. **先架构后细节**：先写 `architecture.md`（选型 + 模块划分 + ADR），再写 `data-model.md`（实体先行，接口依赖数据），最后写 `api-spec.md`（接口对齐数据模型与用户故事）。
 5. **覆盖性核对**：建一张"US → 接口 → 实体"对照表（可写在 `architecture.md` 或交接说明中），逐条确认无遗漏。
 6. **写交接说明**：每份文档正文开头放交接说明块——给谁（下游角色）、一句话（核心结论）、关键决策（3-5 条）、需要下游注意（坑 / 约束 / 未决项）、未决问题（Q-xxx 编号或"无"）。
-7. **提交评审**：三份文档置 IN_REVIEW，通知编排者路由给下游；下游确认后置 APPROVED。
-8. **记录 open question**：任何未决项写入项目工作区 `open-questions.md`，全局唯一编号 Q-xxx，写明"等待谁"；只有被等待的角色能关闭它；阻塞性问题让相关文档进入 BLOCKED 并写明原因。
+7. **提交评审**：三份文档置 IN_REVIEW，通知编排者路由受影响下游 review；意见处理完成后由 architect 作为技术批准者置 APPROVED，业务行为变化还需 product-manager 批准。
+8. **记录 open question**：任何未决项写入项目 `open-questions.md`；等待角色回答，提出者或 test-engineer 验证落地后关闭；阻塞性问题让相关文档进入 BLOCKED。
 9. **守护契约**：阶段 4 期间，任何角色提出契约变更，在 `open-questions.md` 记 C-xxx，我评估影响 → 修订文档（version +0.1，status 回 IN_REVIEW）→ 受影响下游重新确认。
 
 ## 9. 升级与求助

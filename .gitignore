@@ -16,6 +16,8 @@ tmp/
 logs/
 *.log
 nohup.out
+__pycache__/
+*.py[cod]
 
 # 环境变量（如未来引入工具集成）
 .env

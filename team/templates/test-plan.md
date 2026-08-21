@@ -6,6 +6,7 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [02-requirements/user-stories/, 03-architecture/api-spec.md, 04-implementation/*-notes.md]
 downstream: [test-engineer(执行), orchestrator]
+source_revision: WORKTREE
 ---
 
 # 测试方案

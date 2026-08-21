@@ -1,7 +1,7 @@
 ---
 title: <project> 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
-status: LIVE
+status: ACTIVE
 version: 0.1
 updated: YYYY-MM-DD
 upstream: [<规范仓库的交接文档，如 graphx/spec/06-testing-and-handoff.md>]
@@ -23,10 +23,22 @@ downstream: [任何被要求"继续 <project> 开发"的 agent]
 | 项目 | <一句话> |
 | 代码仓库 | <绝对路径>（分支 <branch>） |
 | 规范事实源 | <绝对路径，APPROVED 单一事实源> |
-| 团队 | negentropy（7 角色，协议 v1-docs） |
+| 工作流 | profile `<full / existing-spec / feature / bugfix / spike / ops-only>` |
+| 团队 | negentropy（8 角色，协议 v1.1-docs） |
 | 当前阶段 | <workflow 阶段 + 简述> |
 | 测试状态 | <N passed 全绿> |
+| 测试证据 | <YYYY-MM-DD / revision / command> |
 | 下一步 | <一句话> |
+
+## 项目批准者
+
+| Principal | 实际负责人/稳定 ID | 说明 |
+|---|---|---|
+| project-owner | <user / stable-id> | 范围、残余风险和发布授权 |
+| product-owner | <user / stable-id> | 需求与优先级 |
+| business-owner | <user / stable-id> | 业务规则与术语 |
+
+> 批准者不可用时保持 BLOCKED 并请求决定；等待时间不自动转换为授权。
 
 ## 当前状态（按 `team/workflow.md` 阶段）
 
@@ -63,4 +75,5 @@ downstream: [任何被要求"继续 <project> 开发"的 agent]
 ## 续接指针
 
 - **Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定**：见 `team/handoff.md`（团队能力单一事实源）。
+- **工作认领与并发状态**：见本项目 `WORKBOARD.md`。
 - **本项目基线命令**：<确切命令 + 所需环境变量，如 `cd <repo> && UV_CACHE_DIR=... uv run pytest -q`>

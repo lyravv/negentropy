@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "negentropy team manifest",
+  "type": "object",
+  "required": [
+    "schema_version", "team", "governance", "statuses", "action_modes",
+    "external_principals", "approval_policies", "roles", "workflow",
+    "handoff", "project_template", "evolution"
+  ],
+  "definitions": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+"
+    },
+    "stringSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "properties": {
+    "schema_version": {"const": 1},
+    "team": {
+      "type": "object",
+      "required": ["name", "version", "description", "protocol", "language"],
+      "properties": {
+        "name": {"const": "negentropy"},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "description": {"type": "string", "minLength": 1},
+        "protocol": {"type": "string", "minLength": 1},
+        "language": {"type": "string", "minLength": 1}
+      }
+    },
+    "governance": {
+      "type": "object",
+      "required": ["philosophy", "file", "concurrency", "workflow_profiles", "validation_command"],
+      "properties": {
+        "philosophy": {"$ref": "#/definitions/relativePath"},
+        "file": {"$ref": "#/definitions/relativePath"},
+        "concurrency": {"$ref": "#/definitions/relativePath"},
+        "workflow_profiles": {"$ref": "#/definitions/relativePath"},
+        "validation_command": {"type": "string", "minLength": 1}
+      }
+    },
+    "statuses": {
+      "type": "object",
+      "required": ["document", "project", "stage", "work_item", "question", "change"],
+      "properties": {
+        "document": {"$ref": "#/definitions/stringSet"},
+        "project": {"$ref": "#/definitions/stringSet"},
+        "stage": {"$ref": "#/definitions/stringSet"},
+        "work_item": {"$ref": "#/definitions/stringSet"},
+        "question": {"$ref": "#/definitions/stringSet"},
+        "change": {"$ref": "#/definitions/stringSet"}
+      }
+    },
+    "action_modes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["writes", "commit", "publish"],
+        "properties": {
+          "writes": {"type": ["boolean", "string"]},
+          "commit": {"type": ["boolean", "string"]},
+          "publish": {"type": ["boolean", "string"]}
+        }
+      }
+    },
+    "external_principals": {"$ref": "#/definitions/stringSet"},
+    "approval_policies": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["approvers", "handoff_required"],
+        "properties": {
+          "approvers": {"$ref": "#/definitions/stringSet"},
+          "handoff_required": {"type": "boolean"}
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "entropy", "stages", "dir", "charter", "skills", "mission", "outputs"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+          "name": {"type": "string", "minLength": 1},
+          "entropy": {"type": "string", "minLength": 1},
+          "stages": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 0}},
+          "dir": {"$ref": "#/definitions/relativePath"},
+          "charter": {"$ref": "#/definitions/relativePath"},
+          "skills": {"$ref": "#/definitions/relativePath"},
+          "mission": {"type": "string", "minLength": 1},
+          "outputs": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/relativePath"}},
+          "control_plane": {"type": "boolean"},
+          "parallel_group": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": ["file", "default_profile", "profiles", "profile_maturity", "stages", "feedback_loops"],
+      "properties": {
+        "file": {"$ref": "#/definitions/relativePath"},
+        "default_profile": {"type": "string", "minLength": 1},
+        "profiles": {"$ref": "#/definitions/stringSet"},
+        "profile_maturity": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"enum": ["stable", "beta", "experimental", "deprecated"]}
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "stage", "owner"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+              "stage": {"type": "integer", "minimum": 0},
+              "owner": {
+                "oneOf": [
+                  {"type": "string", "minLength": 1},
+                  {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+                ]
+              },
+              "parallel": {"type": ["boolean", "string"]}
+            }
+          }
+        },
+        "feedback_loops": {"type": "array"}
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "required": ["file", "state_file", "workboard_file"],
+      "properties": {
+        "file": {"$ref": "#/definitions/relativePath"},
+        "state_file": {"type": "string", "minLength": 1},
+        "workboard_file": {"type": "string", "minLength": 1}
+      }
+    },
+    "project_template": {"$ref": "#/definitions/relativePath"},
+    "evolution": {
+      "type": "object",
+      "required": ["changelog", "roadmap"],
+      "properties": {
+        "changelog": {"$ref": "#/definitions/relativePath"},
+        "roadmap": {"$ref": "#/definitions/relativePath"}
+      }
+    }
+  }
+}

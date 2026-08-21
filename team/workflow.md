@@ -1,100 +1,66 @@
 # 工作流（Workflow）
 
-> 定义一个项目从立项到发布的流水线：每个阶段的**负责人、准入（DoR）、产出、准出（DoD）**，
-> 以及阶段间的**并行**与**反馈回路**。
-> 编排者（orchestrator，通常是主 agent）按本文件驱动各角色 sub-agent。
+工作流由阶段模型和可裁剪 profile 组成。默认 profile 是 `full`；已有批准规范的 GraphX 使用 `existing-spec`。profile 的 stable/beta/experimental 成熟度以 `team.yaml` 为准，实验性表示结构已定义但尚未被真实项目完整验证。详细裁剪规则见 `workflow-profiles.md`，状态和批准权见 `governance.md`，取舍遵循 `philosophy.md`。
 
-## 阶段总览
+## 阶段模型
 
-```
-[0 立项] → [1 业务] → [2 需求] → [3 架构] → [4 实现(前端∥后端)] → [5 测试] → [6 发布] → [7 复盘]
-                              ↑__________|  反馈回路（见下）
-```
+| 阶段 | ID | 负责人 | 最小出口证据 |
+|---|---|---|---|
+| 0 立项 | `intake` | orchestrator | STATE、WORKBOARD、项目简报、profile 与事实源 revision |
+| 1 业务 | `business` | business-liaison | 已批准业务规则和术语，或经登记的替代事实源 |
+| 2 需求 | `requirements` | product-manager | 已批准需求/验收标准，或经登记的替代事实源 |
+| 3 架构 | `architecture` | architect | 已批准架构/契约/数据模型，或经登记的替代事实源 |
+| 4 实现 | `implementation` | frontend ∥ backend | scoped 实现、说明、自测及行为同步证据 |
+| 5 测试 | `testing` | test-engineer | 可追溯测试、缺陷状态、带 revision 的质量结论 |
+| 6 发布 | `release` | devops-engineer | 经授权的部署、冒烟、监控、回滚证据 |
+| 7 复盘 | `retrospective` | orchestrator | 复盘和有依据的团队改进行动 |
 
-| 阶段 | ID | 负责角色 | 产出（相对项目工作区） |
-|------|----|---------|----------------------|
-| 0 立项 | `intake` | orchestrator | 项目工作区、`00-intake/project-brief.md` |
-| 1 业务 | `business` | business-liaison | `01-business/business-brief.md`、`01-business/glossary.md` |
-| 2 需求 | `requirements` | product-manager | `02-requirements/requirements.md`、`02-requirements/user-stories/`、`02-requirements/iteration-plan.md` |
-| 3 架构 | `architecture` | architect | `03-architecture/architecture.md`、`03-architecture/api-spec.md`、`03-architecture/data-model.md` |
-| 4 实现 | `implementation` | frontend-engineer ∥ backend-engineer | 代码 + `04-implementation/frontend-notes.md`、`04-implementation/backend-notes.md` |
-| 5 测试 | `testing` | test-engineer | `05-testing/test-plan.md`、`05-testing/defect-log.md`、`05-testing/test-report.md` |
-| 6 发布 | `release` | devops-engineer | `06-ops/deployment.md`、`06-ops/release-notes.md` |
-| 7 复盘 | `retrospective` | orchestrator | `07-retro/retrospective.md` + 回写各角色 `skills.md` |
+## 通用 DoR
 
-## 各阶段细则
+阶段进入 `IN_PROGRESS` 前必须满足：
 
-### 阶段 0 · 立项（orchestrator）
-- **DoR**：有明确的项目诉求（一句话即可，允许模糊）。
-- **动作**：`cp -r projects/_template projects/<name>`；填写 `00-intake/project-brief.md`（背景、目标、干系人、约束）。
-- **DoD**：项目工作区建立，`project-brief.md` 状态为 `APPROVED`。
+- 项目为 `ACTIVE`，profile 已登记；
+- 工作项已认领，action mode、base revision、scope、lease 明确；
+- 上游是匹配当前 scope/revision 的 `APPROVED` 输入，或 profile 合法登记的替代事实源；
+- 目标 worktree 已检查，未知用户修改不会被覆盖；
+- 阻塞性 Q/C 已解决或明确隔离在本 scope 外。
 
-### 阶段 1 · 业务澄清（business-liaison）
-- **DoR**：`project-brief.md` 已 APPROVED。
-- **动作**：澄清业务背景、领域术语、核心流程、外部依赖（第三方系统/合规/数据）。
-- **DoD**：`business-brief.md` 与 `glossary.md` 完成，关键业务问题无未决项（或已显式标注为"待业务方确认"并列出）。
+## 通用 DoD
 
-### 阶段 2 · 需求（product-manager）
-- **DoR**：`business-brief.md` 已 APPROVED。
-- **动作**：把业务诉求转成需求清单、用户故事（含验收标准）、迭代计划（优先级 + 里程碑）。
-- **DoD**：`requirements.md`、`user-stories/`、`iteration-plan.md` 完成；每个用户故事都有可验证的验收标准。
+- profile 要求的产出与批准证据齐全；
+- 规范、契约、实现、测试和交接没有行为矛盾；
+- scoped 验证通过；全量验证无法运行时明确原因和风险；
+- `git diff --check` 通过；
+- WORKBOARD 工作项记录 result revision/`WORKTREE`、验证和遗留；
+- STATE 只更新当前事实和精确下一步，不复制完整报告；
+- 未经 publish 授权没有 push、部署或外部写入。
 
-### 阶段 3 · 架构（architect）
-- **DoR**：`requirements.md` 已 APPROVED。
-- **动作**：技术选型、系统架构、接口设计（api-spec）、数据模型。
-- **DoD**：三份文档完成；接口与数据模型覆盖所有用户故事；选型有理由记录。
+## 阶段细则
 
-### 阶段 4 · 实现（frontend-engineer ∥ backend-engineer，**并行**）
-- **DoR**：`architecture.md`、`api-spec.md`、`data-model.md` 已 APPROVED。
-- **动作**：
-  - 后端：服务、数据库、权限、接口实现。
-  - 前端：界面、交互、前端测试。
-  - 两者以 `api-spec.md` 为契约并行开发；契约变更必须回到 architect 走变更流程。
-- **DoD**：功能按用户故事实现完成；各自 `*-notes.md` 记录实现决策、偏离契约之处、遗留问题。
+### 0 立项
 
-### 阶段 5 · 测试（test-engineer）
-- **DoR**：阶段 4 的 DoD 达成（或达到可测的最小集）。
-- **动作**：测试方案、自动化测试、执行、缺陷记录与回归。
-- **DoD**：`test-plan.md`、`defect-log.md`、`test-report.md` 完成；阻塞性/严重缺陷已修复并回归通过；测试报告给出"可发布/不可发布"结论。
+选择 profile，登记各类权威来源，创建 STATE/WORKBOARD/open-questions，记录授权模式与基线。新项目的范围由用户/项目负责人批准。
 
-### 阶段 6 · 发布（devops-engineer）
-- **DoR**：`test-report.md` 结论为"可发布"。
-- **动作**：环境、部署、监控、备份、发布。
-- **DoD**：`deployment.md`、`release-notes.md` 完成；系统上线且监控/备份就绪。
+### 1–3 业务、需求、架构
 
-### 阶段 7 · 复盘（orchestrator）
-- **DoR**：阶段 6 完成（或项目终止）。
-- **动作**：填写 `07-retro/retrospective.md`（做得好/待改进/行动项）；把可复用的经验**回写**到相关角色的 `skills.md`；结构性变更记入 `evolution/CHANGELOG.md`。
-- **DoD**：复盘文档完成，行动项有归属。
-- **节奏**：默认**项目结束**做一次完整复盘；**不做自动增量复盘**（避免过拟合单个项目）。
-  但**用户/编排者可随时主动触发一次"按需复盘"**（针对某个具体问题/切片）：流程同上、范围限定在触发点，
-  同样回写 `skills.md`/`CHANGELOG.md`，并在 `07-retro/` 留一份带日期的复盘记录（如 `retrospective-YYYYMMDD-<主题>.md`）。
+`full` 按顺序产出；`existing-spec/feature/bugfix` 可引用已有规范。替代输入必须精确到 revision，受影响角色确认够用，阶段记 `SKIPPED` 而不是伪造 `DONE` 文档。
 
-## 反馈回路（Feedback Loops）
+### 4 实现
 
-下游发现上游问题时，**不擅自改上游文档**，而是：
-1. 在自己的文档中记录问题（引用上游文档的具体位置）；
-2. 通过 `open-questions.md` 或 handoff note 打回给上游角色；
-3. 上游角色修订后，重新走该阶段的 DoD。
+前后端只有在写入范围无重叠、共同契约已批准且依赖独立时并行。行为变化必须在同一工作项/集成批次同步规范、契约、测试与交接；契约疑义先提 C/Q，不在实现里私下约定。
 
-| 从 | 到 | 触发条件 |
-|----|----|---------|
-| architect | product-manager | 需求不可实现 / 存在歧义 |
-| product-manager | business-liaison | 业务背景不足 / 术语冲突 |
-| test-engineer | backend-engineer | 后端缺陷 |
-| test-engineer | frontend-engineer | 前端缺陷 |
-| devops-engineer | backend-engineer | 部署阻塞 / 配置缺失 |
+### 5 测试
 
-## 状态标记（所有文档通用）
+先验证测试计划，再执行。报告必须记录被测 revision、命令、日期、结果和未覆盖风险。质量结论由 test-engineer 批准；发布接受残余风险由用户/项目负责人决定。
 
-每份文档头部必须有状态：
+### 6 发布
 
-| 状态 | 含义 |
-|------|------|
-| `DRAFT` | 起草中 |
-| `IN_REVIEW` | 待评审（交给下游/编排者） |
-| `APPROVED` | 已批准，可作为下游输入 |
-| `DONE` | 阶段完成，归档 |
-| `BLOCKED` | 被阻塞（必须写明阻塞原因和等待谁） |
+仅在质量结论允许、发布计划和回滚方案就绪且取得 `publish` 授权后执行。部署与 push 不是实现阶段的默认收尾动作。生产事故按已批准回滚条件先止血，再记录与升级。
 
-> 只有 `APPROVED` 的文档才能作为下游阶段的正式输入。
+### 7 复盘
+
+默认项目/里程碑结束执行；用户可按需触发。只有被多次验证或明确具有通用价值的经验才回写稳定技能；结构性变更进 CHANGELOG。
+
+## 反馈回路
+
+下游引用证据登记 Q/BUG/C，由 orchestrator 路由给事实负责人。关闭和批准按 governance 执行。修订后受影响下游只需重跑影响范围与必要回归，不机械重走无关阶段。

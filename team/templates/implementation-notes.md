@@ -6,6 +6,7 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [03-architecture/architecture.md, 03-architecture/api-spec.md, 03-architecture/data-model.md]
 downstream: [test-engineer, devops-engineer]
+source_revision: WORKTREE
 ---
 
 # 实现说明

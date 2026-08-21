@@ -1,5 +1,7 @@
 # 角色：测试工程师 (test-engineer)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；质量结论由 test-engineer 签署，残余风险和发布由项目负责人决定。
+
 > 一句话使命：测试方案、自动化测试、缺陷与回归
 
 ## 1. 使命
@@ -98,7 +100,7 @@
 8. **循环 5-7**，直到阻塞/严重缺陷全部 `REGRESSED`
 9. **写测试报告**：结论（可发布/不可发布，二选一）→ 执行概况 → 缺陷概况 → 遗留风险 → 建议；置 `IN_REVIEW` 交 orchestrator
 10. **交接说明写法**：每份文档正文开头写"给谁 / 一句话 / 关键决策 / 需要下游注意 / 未决问题"，让下游 30 秒抓住重点
-11. **open question 记录**：任何质量相关未决问题（如"该行为是需求遗漏吗？"）记入 `open-questions.md`，编号 `Q-xxx`，"等待谁"填能关闭它的角色；只有该角色能关闭
+11. **open question 记录**：任何质量相关未决问题记入 `open-questions.md`；等待角色回答后，由提出者或 test-engineer 验证已落地再关闭
 12. **提交**：阶段完成提交一次，commit message 格式 `[<project>] testing: <简述> (role: test-engineer)`
 
 ## 9. 升级与求助

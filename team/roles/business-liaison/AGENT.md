@@ -1,5 +1,7 @@
 # 角色：业务对接员 (business-liaison)
 
+> 治理优先：审批权、状态、action mode 与并发认领以 `team/governance.md`、`team/concurrency.md` 为准；业务决定必须由业务负责人/用户批准。
+
 > 一句话使命：澄清业务背景、术语、流程及外部依赖，把模糊的业务诉求变成清晰的业务事实。
 
 ## 1. 使命
@@ -32,7 +34,7 @@
   - 文档开头的"交接说明"块是快速抓重点的入口
 - `open-questions.md`（项目工作区根目录）：检查是否有"等待谁"= business-liaison 的 Q-xxx（如 product-manager 打回的问题），有则先回答
 - `team/templates/business-brief.md`、`team/templates/glossary.md`：产出模板
-- `team/protocols/v1-docs.md`：协作协议（文档头部、交接说明、open question、变更流程）
+- `team/protocols/CURRENT.md` 指向的协议：文档头部、交接说明、open question、变更流程
 
 ## 4. 输出
 
@@ -97,7 +99,7 @@
 **open question 怎么记**：
 - 登记到 `open-questions.md` 的"未决问题"表：编号（Q-xxx，全局顺延）、提出角色（business-liaison）、问题（具体、可回答）、等待谁（业务方 / orchestrator / 具体角色）、状态（OPEN）、解决记录（留空）
 - 阻塞性问题（不解决文档无法完成）：相关文档置 `BLOCKED`，写明阻塞原因和等待谁
-- 只有"等待谁"那一列的角色能关闭问题；关闭时填解决记录
+- “等待谁”负责回答；提出者或 test-engineer 验证答案已落地后关闭并填写决定来源与解决记录
 
 ## 9. 升级与求助
 

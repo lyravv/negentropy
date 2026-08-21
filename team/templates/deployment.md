@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [03-architecture/architecture.md, 04-implementation/*-notes.md, 05-testing/test-report.md]
 downstream: [orchestrator]
+artifact_type: deployment-plan
+source_revision: N/A
+reviewers: [backend-engineer, test-engineer, orchestrator]
+approver: devops-engineer
+approval_evidence:
 ---
 
 # 部署方案

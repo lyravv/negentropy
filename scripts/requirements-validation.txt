@@ -1,0 +1,2 @@
+PyYAML>=5.3,<7
+jsonschema>=3.2,<5

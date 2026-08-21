@@ -6,6 +6,11 @@ version: 0.1
 updated: YYYY-MM-DD
 upstream: [03-architecture/architecture.md]
 downstream: [frontend-engineer, backend-engineer, test-engineer]
+artifact_type: api-contract
+source_revision: N/A
+reviewers: [frontend-engineer, backend-engineer, test-engineer]
+approver: architect
+approval_evidence:
 ---
 
 # 接口规范
