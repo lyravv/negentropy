@@ -140,6 +140,7 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - GX-INGEST-006：`cf7f9e0` Builder 输入计划（编排者收尾提交）。
 - 私有输出加固（原 W-LEGACY-001 受保护修改）：`1e53457`（原任务落库）。
 - GX-TEST-001：`db3d118` 确定性静态套件绑定 `test_run`。
+- 用户反馈修复轮（GX-APP-015/016/017/018）：`f2de58f` 后端+前端+规范+合规测试+redeploy 脚本（已推送）。
 
 ## 已知遗留（非阻塞，详见 `05-testing/test-report.md` 第 4 节）
 
