@@ -1,29 +1,31 @@
 ---
-title: 实现说明（后端）— Graph 删除 + 推送组织库
+title: 实现说明（后端）— Graph 操作 + 私有 Builder 安全输入准备
 role: backend-engineer
-status: APPROVED
-version: 0.2
-updated: 2026-08-20
-upstream: [graphx/spec/11-workbench-application.md, graphx/spec/03-domain-invariants.md, graphx/spec/08-hgt-protocol-v0.1.md]
+status: IN_REVIEW
+version: 0.3
+updated: 2026-08-21
+upstream: [graphx/spec/03-domain-invariants.md, graphx/spec/05-harness-adapter.md, graphx/spec/08-hgt-protocol-v0.1.md, graphx/spec/09-sql-only-acceptance-profile.md, graphx/spec/11-workbench-application.md]
 downstream: [test-engineer, devops-engineer]
 ---
 
-# 实现说明（后端）— 阶段 4：Graph 删除（GX-APP-012）+ 推送组织库（GX-APP-013）
+# 实现说明（后端）— 阶段 4：Graph 操作 + 私有 Builder 安全输入准备
 
 ## 交接说明
 - **给谁**：test-engineer / devops-engineer
-- **一句话**：新增 `DELETE /api/v1/alpha/graphs/{graph_id}`（级联删除 Mine Graph）与 `POST /api/v1/alpha/graphs/{graph_id}/push`（推送快照到组织库），并在 `bootstrap` 响应新增 `org_library` 字段；全部按 APPROVED 契约实现，现有 116 个测试保持全绿。
+- **一句话**：在既有 Graph 删除/推送交付上新增 GX-INGEST-006：为私有语料生成 content-free、hash-bound、最小权限 Builder 输入计划；真实 Harness 运行仍被 OQ-016 阻塞。
 - **关键决策**：
   1. 错误检查顺序按契约错误表顺序执行：先 404 `GRAPH_NOT_FOUND`，再 409 `GRAPH_READ_ONLY`，最后 409 确认类错误（`DELETE_CONFIRMATION_REQUIRED` / `PUSH_CONFIRMATION_REQUIRED`）。
   2. `PushGraphRequest` 的 `actor`/`confirmed` 用普通 `str`/`bool`（不用 `Literal`），使非法 actor / 未确认请求落到服务层返回 409 而非 FastAPI 422。
   3. 删除在单个事务内按"先子后父"顺序级联删除（ChatMessage → BuildRun → QuestionRun → CandidateReview → Candidate → GraphRevision → GraphConnection → ChatThread → Graph）；连接密钥文件在事务提交后 `unlink(missing_ok=True)`。
   4. 推送只新增 `org_library_graphs` 行（当前 revision 的 bundle + 全量 revision 历史），不修改本地 Graph/Revision，本地保持 `mine` 可编辑。
   5. `bootstrap.org_library` 按 `pushed_at` 升序（`id` 作稳定次级排序键），无条目时为空 list。
+  6. Builder 输入计划只允许 table-only base Bundle、对应 SQL templates 和 business Markdown；历史分析脚本、30 问题、secret/cache exclusion 及预置 edge/hyperedge 均不得进入。
 - **需要下游注意**：
   - 新表 `org_library_graphs` 由 `Base.metadata.create_all` 自动建表（SQLite 开发库首次启动即生效）；Postgres 部署需执行 `CREATE TABLE org_library_graphs`（字段见第 2 节）。
   - 删除/推送端点暂无合规测试（`spec/conformance/requirements.json` 中 GX-APP-012/013 仍为 `planned`，`planned_test` 指向 `tests/conformance/test_graph_delete.py` / `test_graph_push.py`），由 test-engineer 补齐。
+  - Builder 输入计划只是确定性准备，不会启动 Harness、不提交 Candidate、更不会写 Graph revision；OQ-016 未解决前不得装载私有语料到真实角色会话。
   - 本轮**不实现**"从组织库添加只读副本"的 Add 端点（见第 6 节已知限制）。
-- **未决问题**：无（契约问题见 open-questions.md，本轮未新增）
+- **未决问题**：Q-002（等待 devops-engineer：out-of-sandbox credential broker / 等价隔离）
 
 ## 1. 实现范围
 对应 `spec/11-workbench-application.md` 的 GX-APP-012 / GX-APP-013 与 `spec/03-domain-invariants.md` 同名不变量：
@@ -98,3 +100,53 @@ curl "http://127.0.0.1:8001/api/v1/alpha/bootstrap" | jq .org_library
 4. **删除为不可逆操作**：无回收站/软删除；密钥文件 unlink 后不可恢复（符合 GX-APP-012 "Delete is irreversible"）。
 5. **Postgres 迁移**：开发用 SQLite 由 `create_all` 自动建表；生产 Postgres 需补一条 `CREATE TABLE org_library_graphs` 迁移（字段见第 2 节），由 devops-engineer 在部署时执行。
 6. **错误优先级假设**：多错误同时成立时按"404 → READ_ONLY → 确认"顺序返回（见第 4 节），如 test-engineer 认为应不同，请提 open question 由 architect 裁定。
+
+## 7. GX-INGEST-006：私有 Builder 输入准备（2026-08-21）
+
+### 实现与需求映射
+
+| 需求 | 实现 / 测试 |
+|---|---|
+| table-only base，不复制历史 demo relation/hyperedge | `build_builder_input_plan` 拒绝任何 base edge/hyperedge；`test_builder_input_plan_rejects_preloaded_demo_relations` |
+| 最小权限源 allowlist | 只输出 manifest 中的 `sql_template` 与 `business_document`；`test_builder_input_plan_is_least_privilege_and_content_free` |
+| table/source 精确绑定 | 每个 table 必须有且只有一个 source ref，且与 manifest SQL 集合精确相等 |
+| wire contract | `spec/contracts/builder-input-v1.schema.json`；`test_builder_input_runtime_payload_matches_schema` |
+| OQ-016 fail closed | 工具只生成 content-free plan，不包含会话启动/挂载/凭据处理；Q-002 登记真实运行 blocker |
+
+代码位置：`src/graphx_core/corpus.py`、`scripts/build_builder_input_plan.py`。行为同步更新
+`spec/03`、`spec/09`、`spec/06`、`spec/conformance/requirements.json` 与 `spec/manifest.yaml`。
+
+### 受控私有执行证据（产物均在 Git 外）
+
+- corpus manifest：45 accepted inputs（13 SQL、23 business Markdown、8 historical analysis、1 question set），8 path-only exclusions；未读取/哈希 `connection_info.md.txt`。
+- table-only Bundle：13 nodes，0 edges，0 hyperedges。
+- Builder input plan：13 table sources + 23 business evidence sources。
+- 产物路径：`/home/wangling/develop_team/runtime/graphx-eval/private-{corpus-manifest,table-bundle,builder-input-plan}-20260821.json`。
+- 未启动真实 Harness，未读取 golden，未提交 Candidate，未调用 Apply，未改变任何 Graph revision。
+
+### 当前 blocker
+
+真实 Builder 提议 relation/hyperedge 仍 **BLOCKED**：现有 worker 把 provider Token 置于同 UID
+Harness/Bash 可读安全域，违反 OQ-016 默认门禁。不得用 0600 文件或角色目录约定绕过；详见 Q-002。
+
+### BUG-001 / BUG-002 修复记录
+
+- BUG-001：corpus manifest、table Bundle、Builder input plan 改用同目录临时文件
+  `0600` 写入、flush/fsync 后原子 `replace`，并再次强制最终文件为 `0600`；覆盖既有
+  `0664` 文件不会继承旧权限。三个 Git 外产物已重新生成并由 `stat` 验证为 `600`。
+- BUG-002：本文档不再记录实际私有 bundle/plan hash；CLI stdout 同样不输出任何
+  `sha256:` 私有 hash，仅输出计数和 Git 外输出路径。
+- 自动验证：`tests/test_private_corpus_cli.py` 覆盖旧 `0664` 文件替换、最终 mode、临时
+  文件清理和 stdout 无 hash。
+
+### BUG-003 / BUG-004 修复记录
+
+- BUG-003：`build_builder_input_plan` 现在对反序列化 manifest 独立执行 role/path/suffix
+  交叉校验。拒绝绝对路径、空/`.`/`..` 段、反斜线及非规范 POSIX 路径；SQL 仅允许
+  `sql_templates/<filename>.sql`，business evidence 仅允许 `hyperedges/**/*.md`；伪造
+  role 无法放入 connection info、selected questions、Python/cache 或 golden 命名路径。
+  CLI 同时拒绝 symlink manifest 和 Bundle 输入。
+- BUG-004：runtime `BuilderInputPlan.table_sources` 与 wire schema 均要求至少一项，计划
+  构建函数显式要求至少一个 SQL source 和匹配 table node，空 SQL manifest/base fail closed。
+- 负向测试覆盖绝对/遍历/反斜线/非规范路径、secret/question、cache/Python、golden、
+  role/suffix/目录错配、空 SQL/table 及两个 CLI symlink 输入。
