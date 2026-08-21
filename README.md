@@ -48,7 +48,8 @@ negentropy/
 │   │   ├── v1-docs.md         # 当前：纯文档协作
 │   │   └── v2-tools.md        # 规划：yapi / jira 集成
 │   ├── templates/             # 各交付物的文档模板
-│   └── orchestration.md       # 如何用 sub-agent 实际跑起这个团队
+│   ├── orchestration.md       # 如何用 sub-agent 实际跑起这个团队
+│   └── handoff.md             # ★ 交接/续接机制（团队能力单一事实源：Bootstrap/收尾/团队级约束/STATE.md 约定）
 ├── projects/                  # 每个项目一个工作区（根目录必有 STATE.md = 续接入口）
 │   ├── graphx/                # GraphX 项目（STATE.md 见其根目录）
 │   └── _template/             # 项目骨架（开新项目时复制，含 STATE.md 模板）
@@ -71,13 +72,18 @@ negentropy/
 > 「使用 `/home/wangling/develop_team/negentropy` 定义的多agent角色，继续 `<project>` 的开发工作」
 > 这类**只有一句话、不带进度/背景**的指令时，**直接读 `projects/<project>/STATE.md`**。
 
-`STATE.md` 是该项目的**单一"当前状态 + 下一步"入口**，由编排者每轮收尾时更新，包含：
-代码仓库位置、规范事实源、当前所处阶段、**精确的下一步动作**、关键约束、以及完整的
-**Bootstrap 顺序**（新 agent 照此逐步执行即可接手，无需额外上下文）。
+分工（**团队能力 vs 项目内容**）：
+- **`projects/<project>/STATE.md`** = **项目内容**：代码仓库位置、规范事实源、当前阶段、
+  **精确的下一步动作**、项目专属约束、基线命令。由编排者每轮收尾更新。
+- **`team/handoff.md`** = **团队能力**（��一事实源）：Bootstrap 顺序、收尾清单、团队级约束、
+  STATE.md 约定。对所有项目通用，改一处全局生效。
+
+新 agent 读 `STATE.md`（项目内容）→ 顺指针读 `team/handoff.md`（团队能力）→ 按 Bootstrap 顺序接手，
+无需额外上下文。
 
 - 现有项目：`projects/graphx/STATE.md`（GraphX，Graph-first 超图工作台）。
 - 约定：每个项目工作区根目录**必须**有 `STATE.md`；编排者每轮收尾必须更新它（见
-  `team/orchestration.md` 的"继续一个已有项目"）。没有 `STATE.md` 的项目视为未建立可续接状态。
+  `team/handoff.md`）。没有 `STATE.md` 的项目视为未建立可续接状态。
 
 ## 如何"入队"（对任何 agent 框架）
 

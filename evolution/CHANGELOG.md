@@ -4,6 +4,18 @@
 > 项目变更记在各项目工作区；这里只记"团队怎么变的"。
 > 格式：日期 · 类型 · 变更 · 原因。类型：`role` 角色 / `workflow` 流程 / `protocol` 协议 / `template` 模板 / `skill` 技能 / `other`。
 
+## [0.2.1] - 2026-08-21
+### Changed
+- `workflow`/`template`：**把"交接/续接机制"收敛为团队能力单一事实源 `team/handoff.md`**，
+  落实"团队能力沉淀到团队、项目内容用机制在项目同步"的原则。
+  - 新增 `team/handoff.md`：核心原则（团队能力 vs 项目内容）+ STATE.md 约定 + Bootstrap 顺序(模式)
+    + 收尾清单(模式) + 团队级约束 + 新/接手两条路径。
+  - `team/orchestration.md` Resume 节、`README.md` Continue 节 → 缩成**入口指针**，指向 `handoff.md`，不再重复流程。
+  - `projects/_template/STATE.md` 与 `projects/graphx/STATE.md` → **纯化**为"项目内容 + 续接指针"，
+    删除原先重复的 Bootstrap 顺序 / 收尾清单 / 团队级约束。
+- 原因：此前 Bootstrap/收尾/团队级约束在 orchestration、模板、各项目 STATE.md 三处重复，
+  改一处需同步多处。收敛后改团队流程只改 `handoff.md`，所有项目经指针自动生效。
+
 ## [0.2.0] - 2026-08-20
 ### Added
 - `workflow`/`template`：**跨 agent 续接入口 `STATE.md`**。每个项目工作区根目录新增 `STATE.md`

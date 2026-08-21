@@ -7,7 +7,7 @@
 
 team:
   name: negentropy
-  version: 0.2.0
+  version: 0.2.1
   description: 以文档为协作介质、以 git 为单一事实源的软件开发团队
   protocol: v1-docs            # 当前生效的协作协议，见 team/protocols/CURRENT.md
   language: zh-CN              # 文档默认语言
@@ -119,6 +119,12 @@ workflow:
     - { from: test-engineer,     to: frontend-engineer,  trigger: 缺陷 }
     - { from: devops-engineer,   to: backend-engineer,   trigger: 部署阻塞 }
     - { from: product-manager,   to: business-liaison,   trigger: 业务背景不足 }
+
+# 交接/续接机制（团队能力单一事实源）：让任意项目（新/接手）被任意 agent 一句话续接
+handoff:
+  file: team/handoff.md
+  desc: Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定（团队能力，改一处全局生效）
+  state_file: projects/<project>/STATE.md   # 项目内容入口（只放项目内容 + 指向本机制的指针）
 
 project_template: projects/_template
 evolution:

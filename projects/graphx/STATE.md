@@ -1,19 +1,21 @@
 ---
-title: GraphX 项目当前状态与下一步（单一入口 / STATE）
+title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: LIVE
-version: 1.0
-updated: 2026-08-20
+version: 2.0
+updated: 2026-08-21
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
 
 # GraphX · 当前状态与下一步（STATE）
 
-> **这是"继续 graphx 开发"的单一入口。**
+> **本文件只放"项目内容"**（我们在哪 + 下一步 + 项目专属约束）。
+> **团队能力**（Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定）的单一事实源在
+> **`team/handoff.md`**，本文件不重复——只留指针（见文末「续接指针」）。
 > 任何 agent（DSH / Claude Code / Cursor / 自研引擎）收到
 > **「使用 /home/wangling/develop_team/negentropy 定义的多agent角色，继续 graphx 的开发工作」**
-> 时，**先读本文件**，按下方「Bootstrap 顺序」执行即可，**无需额外背景或进度信息**。
+> 时，**先读本文件**，再顺指针读 `team/handoff.md` 按 Bootstrap 顺序接手，**无需额外背景或进度信息**。
 > 本文件由编排者（orchestrator）在每轮收尾时更新，是"我们在哪 + 下一步做什么"的权威快照。
 
 ## 30 秒速览
@@ -25,24 +27,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 团队 | negentropy（7 角色，协议 `v1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付 GX-APP-012/013/014 |
-| 测试状态 | **126 passed + 12 subtests 全绿**（`uv run pytest -q`） |
+| 测试状态 | **126 passed + 12 subtests 全绿** |
 | 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，新特性生效需重启/重新部署，见阶段 6） |
 | 下一步 | 用私有语料跑 Builder 提议关系与语义超边（见「下一步动作」第 1 条） |
-
-## Bootstrap 顺序（新 agent 照此执行，逐步）
-
-1. 读本文件（`STATE.md`）——拿到"在哪 + 下一步 + 约束"。
-2. 读团队入口 `/home/wangling/develop_team/negentropy/README.md` 与
-   `team/orchestration.md`——如何把任务派给角色 sub-agent（标准 prompt 结构）。
-3. 读代码仓库 `/home/wangling/develop_team/graphx/AGENTS.md`——工程铁律 + 变更协议。
-4. 读规范事实源 `/home/wangling/develop_team/graphx/spec/README.md`，**按其指定顺序**读相关规范。
-5. 读 `/home/wangling/develop_team/graphx/spec/06-testing-and-handoff.md` 的
-   **「Continue in this order」**——权威下一步清单（本文件「下一步动作」是它的摘要）。
-6. 跑基线确认全绿：
-   `cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`
-7. 按「下一步动作」派对应角色 sub-agent（用 `orchestration.md` 的标准 prompt 结构；
-   阶段 4 前后端可并行，阶段 5 测试在实现完成后）。
-8. 收尾：按「收尾清单」更新本文件 + `spec/06` + 提交推送。
 
 ## 当前状态（按 `team/workflow.md` 阶段）
 
@@ -78,12 +65,10 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 9. 把应用投影变更迁移到可执行 HGT Patch，实现规范持久 Graph store、授权、审批、outbox、原子 Apply。
 10. 组织库后续：只读"从组织库添加"端点、可选推送去重、Postgres `org_library_graphs` 迁移。
 
-## 关键约束（任何 agent 必须遵守，违反即停）
+## 项目专属约束（只列 graphx 特有的；团队级约束见 `team/handoff.md` §4）
 
 - **uv 环境**：依赖 `uv sync` 管理；**必须带 `UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv`**
   （系统 uv 缓存 `/home/wangling/.cache/uv` 只读，不带会报 Read-only file system）。
-- **机密**：Token、数据库连接、代理配置**不得**打印、写入 Git 或进入 Graph 数据/提示/Trace/日志。
-- **不覆盖**：动手前 `git status` 检查，不覆盖用户已有未提交修改。
 - **变更协议**（graphx `AGENTS.md`）：任何行为修改必须**同一变更**内更新
   ① `spec/conformance/requirements.json` 稳定需求 ID ② 规范 ③ 契约/schema（若 wire 变）
   ④ 合规/单测 ⑤ `spec/manifest.yaml`（破坏性决策加 ADR）⑥ `spec/06` 交接状态。
@@ -95,6 +80,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - **范围**：所有工作材料只放在 `/home/wangling/develop_team` 下；不加载私有/不可信源到真实角色会话
   （凭据隔离是前置条件，见 `spec/07` OQ-016）。
 
+> 团队级约束（机密不得打印/入 Git/入 Graph 数据、动手前 `git status` 不覆盖未提交修改等）
+> 见 `team/handoff.md` §4，对所有项目通用，此处不重复。
+
 ## 本轮已交付（阶段 4–5，GX-APP-012/013/014）
 
 | 角色 | 产出 | 状态 |
@@ -105,16 +93,7 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | orchestrator | `open-questions.md`（Q-001 已 RESOLVED：删除 `confirmed` 缺失/非 true 一律 409） | — |
 
 对应 graphx 提交（`feat/trusted-build-core`，已推送）：
-`c84cef6` 后端 / `7a7741e` 前端+画布 / `00b95c9` 合规测试 / `475bb87` 规范+交接。
-
-## 收尾清单（每轮结束，编排者执行）
-
-1. 更新本文件（当前状态 + 下一步）与 `graphx/spec/06`（delivered / limitations / continue）。
-2. 更新 `spec/conformance/requirements.json` 状态 + `spec/manifest.yaml`。
-3. 跑全量测试 + `git diff --check`（必须全绿、无空白错误）。
-4. 提交 graphx 仓库（`type:scope` 小提交，如 `feat:`/`test:`/`docs:`）+ 推送 origin。
-5. 提交 negentropy 项目工作区变更（本目录）。
-6. 在最终交接里留下**分支/提交 + 精确下一步**。
+`c84cef6` 后端 / `7a7741e` 前端+画布 / `00b95c9` 合规测试 / `475bb87` 规范+交接 / `b1a542f` manifest 日期同步。
 
 ## 已知遗留（非阻塞，详见 `05-testing/test-report.md` 第 4 节）
 
@@ -123,3 +102,8 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - 画布合规测试为源码级断言（锁定渲染形态不回退），非 DOM 级视觉验证。
 - 推送后本地副本归属为产品决策（`spec/07` OQ-017，默认保持 `Mine · editable`）。
 - 应用 `10.54.56.113:8001` 跑旧代码，删除/推送生效需重启/重新部署（阶段 6，devops）。
+
+## 续接指针
+
+- **Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定**：见 `team/handoff.md`（团队能力单一事实源）。
+- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 126 passed + 12 subtests 全绿）。
