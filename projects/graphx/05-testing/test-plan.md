@@ -1,23 +1,54 @@
 ---
-title: 测试方案 — GX-INGEST-006
+title: 测试方案 — GX-APP-015/016/017/018
 role: test-engineer
 status: APPROVED
-version: 0.2
+version: 0.3
 updated: 2026-08-21
-upstream: [graphx/spec/03-domain-invariants.md, graphx/spec/09-sql-only-acceptance-profile.md, graphx/spec/contracts/builder-input-v1.schema.json, graphx/spec/conformance/requirements.json, 04-implementation/backend-notes.md]
+upstream: [graphx/spec/11-workbench-application.md, graphx/spec/03-domain-invariants.md, graphx/spec/06-testing-and-handoff.md, graphx/spec/conformance/requirements.json, 04-implementation/backend-notes.md]
 downstream: [backend-engineer, orchestrator]
 ---
 
-# 测试方案 — GX-INGEST-006
+# 测试方案 — GX-APP-015/016/017/018
 
 ## 交接说明
 - **给谁**：backend-engineer / orchestrator
-- **一句话**：验证 table-only base、SQL ref 精确绑定、最小 business Markdown allowlist、路径安全和私有产物写入。
-- **关键决策**：CLI manifest 按不可信输入测试；覆盖伪造 role、绝对路径、`..`、symlink、secret/cache/golden 和空 SQL/base。
-- **需要下游注意**：不得读取/打印 golden、connection_info 或私有正文；Git 外 JSON 仅检查结构、计数、分类、绑定和权限。
-- **未决问题**：无；BUG-001～004 均已回归通过。
+- **一句话**：验证 Chat 生命周期门禁、多轮 Build、非构建模式真实智能体对话与空工作台 bootstrap 四个工作台行为。
+- **关键决策**：四个需求均以确定性 fake harness 做 conformance 测试，mock 运行时无需 LLM key/网络（AGENTS.md 铁律）。
+- **需要下游注意**：真实 DeepSeek Harness 路径由既有 harness 集成测试覆盖；真实 provider 端到端为后续项。
+- **未决问题**：OQ-016（凭据隔离）仍阻塞真实私有语料 Harness 会话。
 
-## 用例与门槛
+## 本轮用例与门槛（GX-APP-015/016/017/018）
+
+| 用例 | 验证 | 优先级 |
+|---|---|---|
+| TC-008 | GX-APP-015：Chat 未发消息前为 unused；`bootstrap.chats[]` 暴露 `unused`；已有 unused Chat 时 `POST /graphs/{graph_id}/chats` 返回 409 `CHAT_ALREADY_UNUSED` | P0 |
+| TC-009 | GX-APP-016：非空 Graph 的后续 Build 轮次被接受；Builder 经类型化工具网关设计 HGT Patch；服务端读回并重新校验 Candidate 后才允许用户 Apply；确定性模式后续轮次 409 `BUILD_REQUIRES_HARNESS` | P0 |
+| TC-010 | GX-APP-017：非业务问题由只读 Builder 角色 Harness 会话回答（基于当前 Graph + 最近对话）；智能体不提交 Candidate、不改 Graph；harness 关闭/失败回退确定性上下文感知回复 | P0 |
+| TC-011 | GX-APP-018：零 Graph 时 `bootstrap` 返回 200 空投影（`active_graph: null`、`thread: null`、空列表）而非 404 | P0 |
+
+Conformance 映射：
+
+| 需求 | Conformance 测试 |
+|---|---|
+| GX-APP-015 | `tests/conformance/test_chat_lifecycle.py::test_create_chat_rejected_when_unused_chat_exists` |
+| GX-APP-016 | `tests/conformance/test_multi_round_build.py::test_second_build_round_produces_candidate` |
+| GX-APP-017 | `tests/conformance/test_agent_chat.py::test_non_business_question_uses_agent` |
+| GX-APP-018 | `tests/conformance/test_empty_workbench.py::test_bootstrap_empty_when_no_graphs` |
+
+通过标准：P0 100%，全量回归无阻塞/严重缺陷。否则结论为“不可发布”。
+
+## 安全执行
+
+```bash
+UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q
+UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest \
+  tests/conformance/test_chat_lifecycle.py tests/conformance/test_multi_round_build.py \
+  tests/conformance/test_agent_chat.py tests/conformance/test_empty_workbench.py -v
+```
+
+所有 conformance 用例使用合成临时数据与确定性 fake harness；测试角色不修改后端实现。
+
+## 上一轮用例与门槛（GX-INGEST-006，已回归）
 
 | 用例 | 验证 | 优先级 |
 |---|---|---|
@@ -31,7 +62,7 @@ downstream: [backend-engineer, orchestrator]
 
 通过标准：P0/P1 100%，无阻塞/严重缺陷，私有产物无 group/other 权限，目标回归在 30 秒硬超时内通过。否则结论为“不可发布”。
 
-## 安全执行
+## 上一轮安全执行（GX-INGEST-006）
 
 ```bash
 timeout --signal=TERM --kill-after=5s 30s .venv/bin/pytest -q \

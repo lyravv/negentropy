@@ -27,10 +27,10 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付 GX-INGEST-006 安全前置 + GX-TEST-001 静态套件绑定 |
-| 测试状态 | **全量 150 passed + 12 subtests 全绿**（2026-08-21 重跑，含 GX-TEST-001 6 条合规用例） |
-| 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，新特性生效需重启/重新部署，见阶段 6） |
-| 下一步 | 静态套件绑定已交付（GX-TEST-001）；剩余：① 关闭 Q-002/OQ-016 凭据隔离门禁（Builder 实跑前置）② 用已绑定套件执行 30 条盲评并冻结 Tester 输出 |
+| 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付用户反馈修复轮（GX-APP-015/016/017/018）；阶段 6（发布）待用户在宿主机执行重新部署 |
+| 测试状态 | **全量 154 passed + 12 subtests 全绿**（2026-08-21 重跑，含 GX-APP-015/016/017/018 4 条合规用例） |
+| 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，本轮 5 条修复生效需用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`，见阶段 6） |
+| 下一步 | ① 用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`（重新部署 + 清空全部现有 Graph，用户已授权）② 部署后复验 5 条反馈 ③ 关闭 Q-002/OQ-016 凭据隔离门禁（Builder 实跑前置）④ 用已绑定套件执行 30 条盲评并冻结 Tester 输出 |
 
 ## 项目批准者
 
@@ -50,9 +50,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **部分完成** | GX-INGEST-006 已交付；真实 Builder 会话被 OQ-016 阻塞 |
-| 5 测试 | test-engineer | **部分完成** | GX-INGEST-006 定向 30 tests 通过；GX-TEST-001 静态套件绑定 `test_run` 已交付（6 条合规用例）；**30 条业务盲评运行时执行 + 输出冻结未做** |
-| 6 发布 | devops-engineer | 未开始 | 需重启/重新部署 `10.54.56.113:8001`；Postgres 迁移 |
+| 4 实现 | frontend ∥ backend | **部分完成** | 用户反馈修复轮（GX-APP-015/016/017/018）已交付；真实 Builder 会话被 OQ-016 阻塞 |
+| 5 测试 | test-engineer | **部分完成** | 本轮 4 条合规用例 + 全量 154 passed 通过；**30 条业务盲评运行时执行 + 输出冻结未做** |
+| 6 发布 | devops-engineer | **进行中** | `scripts/redeploy_alpha.sh` 已就绪，已在 8002 临时实例验证 5 条行为；**待用户在宿主机执行 `--clear-graphs`**（沙箱无法 signal 宿主机进程）；Postgres 迁移未做 |
 | 7 复盘 | orchestrator | 未开始 | |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
@@ -114,6 +114,20 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - 合规测试 `tests/conformance/test_static_suite.py`（6 条，全合成数据）；全量 **150 passed + 12 subtests**。
 - 未读 golden / 私有语料，未启动真实 Harness，未改变 Graph revision。30 条盲评运行时执行 + 输出冻结仍待做。
 
+### 2026-08-21 · 用户反馈修复轮（GX-APP-015/016/017/018）
+
+针对用户 5 条体验反馈，新增 4 条需求并全链路交付（规范/契约/测试/前后端）：
+
+- **GX-APP-015 Chat 生命周期门禁**：Chat 未使用（无用户消息）时禁止新建；`bootstrap.chats[]` 暴露 `unused`；`POST /graphs/{id}/chats` 已有未使用 Chat 时返回 409 `CHAT_ALREADY_UNUSED`；前端禁用"新建对话"并提示。
+- **GX-APP-016 多轮 Build**：非空 Graph 的后续 Build 轮次被接受——Builder 经类型化工具网关设计 HGT Patch 并提交，服务端读回 Candidate、重校验 base 绑定与结构后 Review；确定性模式后续轮次 fail-closed（409 `BUILD_REQUIRES_HARNESS`）。
+- **GX-APP-017 非 Build 真实智能体对话**：非业务问题由只读 Builder 角色 Harness 会话基于当前 Graph + 近期对话回答；Agent 不提交 Candidate、不改 Graph；Harness 关闭/失败回退确定性上下文回复（mock 运行时保持无 LLM key/网络可用）。
+- **GX-APP-018 空工作台 bootstrap**：零 Graph 时 `bootstrap` 返回 200 空投影（`active_graph: null`、`thread: null`、空列表）而非 404，前端提供"创建第一个 Graph"。
+- 规范同步：4 条需求入 `spec/03`+`spec/11`+`spec/06`、`requirements.json` implemented、`manifest.yaml` 4 个新标志、API 契约文档（bootstrap `unused`/空态、Create Chat 409、Build 多轮、普通问答 agent-chat）。
+- 合规测试 4 条（`test_chat_lifecycle`/`test_multi_round_build`/`test_agent_chat`/`test_empty_workbench`）；全量 **154 passed + 12 subtests**，无新缺陷。
+- 前端：`App.tsx`/`api.ts`/`styles.css`（禁建+提示、空工作台状态、删除失败 toast 持久化、可空性守卫）；`tsc -b`+`vite build` 零错误。
+- 部署：`scripts/redeploy_alpha.sh`（保留原进程环境重启 + 可选 `--clear-graphs`）；已在 8002 临时实例验证 5 条行为全过；**待用户在宿主机执行**。
+- 未读 golden / 私有语料，未改变 Graph revision；真实 provider 的 agent-chat / 多轮 design Build 为后续端到端验证项。
+
 | 角色 | 产出 | 状态 |
 |---|---|---|
 | backend-engineer | `04-implementation/backend-notes.md`（删除 + 推送 + `bootstrap.org_library`） | APPROVED |
@@ -133,10 +147,12 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - 组织库无 Add/删除/更新端点（Add 弹窗仅只读展示）；重复推送不去重。
 - 画布合规测试为源码级断言（锁定渲染形态不回退），非 DOM 级视觉验证。
 - 推送后本地副本归属为产品决策（`spec/07` OQ-017，默认保持 `Mine · editable`）。
-- 应用 `10.54.56.113:8001` 跑旧代码，删除/推送生效需重启/重新部署（阶段 6，devops）。
+- 应用 `10.54.56.113:8001` 跑旧代码，本轮 5 条修复生效需用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`（阶段 6，devops）。
+- 前端 `pushGraph`/`send` 失败路径的 toast 同样会被后续 `refresh()` 清除（与本轮已修复的 `deleteGraph` 同型），留作后续项。
+- 真实 provider 的 agent-chat（GX-APP-017）与多轮 design Build（GX-APP-016）本轮以确定性 fake harness 验证；真实 DeepSeek Harness 端到端为后续项。
 
 ## 续接指针
 
 - **Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定**：见 `team/handoff.md`（团队能力单一事实源）。
 - **工作认领 / lease / 写入范围**：见 `projects/graphx/WORKBOARD.md`；开始下一项写任务前先认领。
-- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 **150 passed + 12 subtests**，2026-08-21 验证，base `db3d118`）。
+- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 **154 passed + 12 subtests**，2026-08-21 验证，base `db3d118` + 本轮 WORKTREE）。

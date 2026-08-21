@@ -1,18 +1,18 @@
 ---
-title: 缺陷日志 — GX-INGEST-006
+title: 缺陷日志 — GX-APP-015/016/017/018
 role: test-engineer
 status: APPROVED
-version: 0.2
+version: 0.3
 updated: 2026-08-21
 upstream: [05-testing/test-plan.md]
 downstream: [backend-engineer, orchestrator]
 ---
 
-# 缺陷日志 — GX-INGEST-006
+# 缺陷日志 — GX-APP-015/016/017/018
 
 ## 交接说明
 - **给谁**：backend-engineer / orchestrator
-- **一句话**：BUG-001～004 均已修复并完成定向回归，未发现新缺陷。
+- **一句话**：本轮（GX-APP-015/016/017/018）全量回归通过，5 项用户反馈均已处理，未发现新缺陷；BUG-001～004 保持 REGRESSED。
 - **关键决策**：content-free plan 仍是安全边界，不能信任调用者提供的 manifest role/path。
 - **需要下游注意**：保留反序列化入口的路径/role 负向用例，防止最小 allowlist 回退。
 - **未决问题**：无。
@@ -28,4 +28,5 @@ downstream: [backend-engineer, orchestrator]
 
 ## 回归结论
 
-目标组 `30 passed in 2.54s`。BUG-001～004 全部为 `REGRESSED`，无 OPEN 缺陷。
+- 上一轮（GX-INGEST-006）：目标组 `30 passed in 2.54s`。BUG-001～004 全部为 `REGRESSED`，无 OPEN 缺陷。
+- 本轮（GX-APP-015/016/017/018）：全量回归 `154 passed, 12 subtests passed in 7.51s`（退出码 0），5 项用户反馈均已处理，未发现新缺陷。
