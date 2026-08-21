@@ -1,7 +1,7 @@
 ---
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
-status: LIVE
+status: ACTIVE
 version: 2.0
 updated: 2026-08-21
 upstream: [graphx/spec/06-testing-and-handoff.md]
@@ -23,43 +23,46 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送 origin） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，base `cf7f9e0` + **WORKTREE**；现有修改受保护，未声明已推送） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
-| 团队 | negentropy（7 角色，协议 `v1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付 GX-APP-012/013/014 |
-| 测试状态 | **126 passed + 12 subtests 全绿** |
+| 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
+| 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
+| 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付 GX-INGEST-006 安全前置 + GX-TEST-001 静态套件绑定 |
+| 测试状态 | **全量 150 passed + 12 subtests 全绿**（2026-08-21 重跑，含 GX-TEST-001 6 条合规用例） |
 | 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，新特性生效需重启/重新部署，见阶段 6） |
-| 下一步 | 用私有语料跑 Builder 提议关系与语义超边（见「下一步动作」第 1 条） |
+| 下一步 | 静态套件绑定已交付（GX-TEST-001）；剩余：① 关闭 Q-002/OQ-016 凭据隔离门禁（Builder 实跑前置）② 用已绑定套件执行 30 条盲评并冻结 Tester 输出 |
 
 ## 当前状态（按 `team/workflow.md` 阶段）
 
 | 阶段 | 负责角色 | 状态 | 说明 |
 |---|---|---|---|
 | 0 立项 | orchestrator | DONE | `00-intake/project-brief.md` APPROVED |
-| 1 业务 | business-liaison | DONE（由 graphx/spec 固化） | `spec/01` 产品范围 |
-| 2 需求 | product-manager | DONE（由 graphx/spec 固化） | `spec/01/09/10/12` |
-| 3 架构 | architect | DONE（由 graphx/spec 固化） | `spec/02/05/08` + `spec/contracts` |
-| 4 实现 | frontend ∥ backend | **部分完成** | GX-APP-012/013/014 已交付；**私有语料 Builder 构图未做** |
-| 5 测试 | test-engineer | **部分完成** | GX-APP-012/013/014 合规测试通过；**30 条盲评未跑** |
+| 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
+| 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
+| 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
+| 4 实现 | frontend ∥ backend | **部分完成** | GX-INGEST-006 已交付；真实 Builder 会话被 OQ-016 阻塞 |
+| 5 测试 | test-engineer | **部分完成** | GX-INGEST-006 定向 30 tests 通过；GX-TEST-001 静态套件绑定 `test_run` 已交付（6 条合规用例）；**30 条业务盲评运行时执行 + 输出冻结未做** |
 | 6 发布 | devops-engineer | 未开始 | 需重启/重新部署 `10.54.56.113:8001`；Postgres 迁移 |
 | 7 复盘 | orchestrator | 未开始 | |
 
-> 说明：阶段 1–3 的"业务/需求/架构"文档不在本工作区，而是由 `graphx/spec/` 固化并 APPROVED
+> 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
 ## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
 
-1. **（当前）** 用私有语料跑 Builder 提议 table-table 关系与语义超边；**不直接抄历史 demo 对象**。
+1. **（当前门禁）** 实现 out-of-sandbox credential broker（或等价 UID/mount 隔离），证明真实 provider Token 对 Agent/Bash 不可读，关闭 Q-002/OQ-016。
+   - 角色：devops-engineer（隔离实现）+ architect（安全边界确认）+ test-engineer（对抗验证）。
+   - 禁止：不得以 0600 文件、目录约定或同 UID 子进程作为凭据边界；门禁关闭前不得装载私有语料到真实角色会话。
+2. **门禁关闭后**用私有语料跑 Builder 提议 table-table 关系与语义超边；**不直接抄历史 demo 对象**。
    - 角色：backend-engineer（驱动 Builder 执行）+ test-engineer（验证）。
    - 私有语料（Git 外）：`/home/wangling/develop_team/graph_poc_doc/`
      （`sql_templates/` 13 个 SQL 模板、`hyperedges/` 业务证据、`selected_30_questions.csv`、
      `connection_info.md.txt` 为**排除项**，内容不得读/哈希/入 manifest）。
    - 业务问题盲评套件：`/home/wangling/develop_team/runtime/graphx-eval/`（Git 外）。
-2. 独立 Reviewer 检查 join key、数量/状态语义、红蓝记账规则、证据覆盖、缺失员工源。
-3. 把确定性静态套件绑到 `test_run`，跑完 30 条盲评用例，**冻结 Tester 输出**后评估者才读 golden。
-4. 通过原生插件提交真实 ReviewReport / TestReport，冻结其脱敏验证 trace。
-5. 加 SELECT-only 数据库工具，对 golden 标签做执行验证。
-6. 把 provider 认证移出 Agent/Bash 安全域，再摄取不可信第三方代码/文档，并证明真实 Token 不可读。
+3. 独立 Reviewer 检查 join key、数量/状态语义、红蓝记账规则、证据覆盖、缺失员工源。
+4. 确定性静态套件绑到 `test_run` **已交付**（GX-TEST-001，`db3d118`）；剩余：用已绑定套件**执行 30 条盲评用例**并**冻结 Tester 输出**后评估者才读 golden（运行时操作，需访问 Git 外私有 question suite，不读 golden）。
+5. 通过原生插件提交真实 ReviewReport / TestReport，冻结其脱敏验证 trace。
+6. 加 SELECT-only 数据库工具，对 golden 标签做执行验证。
 7. 用业务材料验证可运行工作台旅程，按用户反馈细化 graph/file/chat/merge 行为。
 8. 用原生 Harness 角色会话替换轻量 Build 执行器（保持 Candidate Apply 用户可控）。
 9. 把应用投影变更迁移到可执行 HGT Patch，实现规范持久 Graph store、授权、审批、outbox、原子 Apply。
@@ -85,6 +88,22 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 
 ## 本轮已交付（阶段 4–5，GX-APP-012/013/014）
 
+### 2026-08-21 · GX-INGEST-006
+
+- Builder input plan 只包含 table-only base Bundle、精确绑定的 SQL templates 和 business Markdown evidence；排除历史脚本、问题集、secret/cache 与预置 relation/hyperedge。
+- 私有 Git 外产物使用原子 `0600` 写入；CLI/stdout 与 Git 文档不输出私有 hash。
+- test-engineer 回归 **30 passed**，BUG-001–004 全部 `REGRESSED`，GX-INGEST-006 结论“可发布”。
+- 未启动真实 Harness，未读 golden / `connection_info.md.txt` 正文，未提交 Candidate，未改变 Graph revision。
+
+### 2026-08-21 · GX-TEST-001（确定性静态套件绑定 `test_run`）
+
+- 新增 `graphx_core/static_suite.py`：纯函数确定性静态套件（`candidate_patch_applicable` → `bundle_valid` → 每个被认领 intent 的 `required_tables_bound:<intent>`），无 SQL/LLM/网络/DB/私有 golden。
+- `test_run` 现在执行套件并注册 typed `TestReportArtifact`（`artifact_kind="test"`）；被认领 intent 由服务端绑定（`question_intents`），模型不可选；fail-closed 保持（无候选 → `CANDIDATE_NOT_BOUND`，二次提交 → `ARTIFACT_ALREADY_SUBMITTED`，非 Tester → `TOOL_ACCESS_DENIED`）。
+- `question_executor.py` 改为从 core 导入共享 intent→table→source-ref 映射（单一事实源，行为不变）。
+- 规范同步：GX-TEST-001 入 `spec/03`+`spec/12`、`requirements.json` implemented、`manifest.yaml` 标志、`spec/06` delivered/continue。
+- 合规测试 `tests/conformance/test_static_suite.py`（6 条，全合成数据）；全量 **150 passed + 12 subtests**。
+- 未读 golden / 私有语料，未启动真实 Harness，未改变 Graph revision。30 条盲评运行时执行 + 输出冻结仍待做。
+
 | 角色 | 产出 | 状态 |
 |---|---|---|
 | backend-engineer | `04-implementation/backend-notes.md`（删除 + 推送 + `bootstrap.org_library`） | APPROVED |
@@ -93,7 +112,10 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | orchestrator | `open-questions.md`（Q-001 已 RESOLVED：删除 `confirmed` 缺失/非 true 一律 409） | — |
 
 对应 graphx 提交（`feat/trusted-build-core`，已推送）：
-`c84cef6` 后端 / `7a7741e` 前端+画布 / `00b95c9` 合规测试 / `475bb87` 规范+交接 / `b1a542f` manifest 日期同步。
+- GX-APP-012/013/014：`c84cef6` 后端 / `7a7741e` 前端+画布 / `00b95c9` 合规测试 / `475bb87` 规范+交接 / `b1a542f` manifest 日期同步。
+- GX-INGEST-006：`cf7f9e0` Builder 输入计划（编排者收尾提交）。
+- 私有输出加固（原 W-LEGACY-001 受保护修改）：`1e53457`（原任务落库）。
+- GX-TEST-001：`db3d118` 确定性静态套件绑定 `test_run`。
 
 ## 已知遗留（非阻塞，详见 `05-testing/test-report.md` 第 4 节）
 
@@ -106,4 +128,5 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 ## 续接指针
 
 - **Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定**：见 `team/handoff.md`（团队能力单一事实源）。
-- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 126 passed + 12 subtests 全绿）。
+- **工作认领 / lease / 写入范围**：见 `projects/graphx/WORKBOARD.md`；开始下一项写任务前先认领。
+- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 **150 passed + 12 subtests**，2026-08-21 验证，base `db3d118`）。
