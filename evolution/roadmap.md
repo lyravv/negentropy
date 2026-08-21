@@ -14,6 +14,7 @@
 | 用真实项目跑通 v1 全流程 | workflow | PLANNED | 验证流水线与模板是否顺手，收集第一批复盘 |
 | 沉淀各角色首批 skills | skill | PLANNED | 前 1-2 个项目后，把通用偏好写进各 skills.md |
 | 模板瘦身/增补 | template | PLANNED | 根据实际使用删减冗余字段、补充缺失模板 |
+| **多编排者并发协调协议** | workflow | PLANNED | 支持**多个 agent 入口（多编排者）同时**推进同一项目：① 工作台账(WORKBOARD，谁在干什么) ② 先认领再动手(文件锁，防重复) ③ 契约先行(architect 先定 API/数据契约，前后端对着契约并行) ④ 分支+领域划分(各管不重叠文件，防冲突) ⑤ 集成(合并+全量测试绿=兼容)。前提：并行仅限相互独立任务(先做依赖分析)。落地为 `team/concurrency.md` + 台账(独立 WORKBOARD.md 或并入 STATE.md，待定) + handoff/orchestration 指针 + team.yaml 登记。触发：用户 2026-08-21 提出多 agent 入口并发需求，先记录后续再做 |
 
 ## 中期（引入协同工具，协议 v2）
 
