@@ -2,8 +2,8 @@
 title: 未决问题与变更请求
 role: orchestrator(维护) / 全员(提出)
 status: DRAFT
-version: 0.2
-updated: 2026-08-20
+version: 0.3
+updated: 2026-08-21
 upstream: []
 downstream: [全员]
 ---
@@ -23,4 +23,4 @@ downstream: [全员]
 ## 变更请求（Change Requests）
 | 编号 | 提出角色 | 目标文档 | 变更内容 | 影响评估 | 状态 |
 |------|---------|---------|---------|---------|------|
-| C-001 | | | | | PENDING / APPROVED / REJECTED |
+| C-001 | product-manager(另一 agent 提出) | spec/01,05,07 + decisions | 可验证的自定义模型供应商：DeepSeek 保持默认，允许运营者显式选择经无业务数据探测通过的内网 OpenAI-compatible qwen3.6-27b 备选（US-001，9 条 AC）。与 Phase 1 窄冲突（model routing 原为非范围）。 | 产品负责人（用户）2026-08-21 决定**砍掉该需求**：US-001 已删除，不进入架构评估/实现。DeepSeek 维持唯一绑定（PD-020/OQ-003 不变）。如未来重启需重新立项。 | REJECTED |
