@@ -16,6 +16,7 @@
 | 模板瘦身/增补 | template | PLANNED | 根据实际使用删减冗余字段、补充缺失模板 |
 | 多编排者并发协调协议 | workflow | DONE | 已落地 `concurrency.md`、WORKBOARD、lease、scope/base revision、冲突与集成门禁；后续用 GraphX 多入口实践校准 lease 时长 |
 | 最低充分秩序哲学与审视准则 | workflow | DONE | 已落地 `team/philosophy.md`，后续团队建议必须说明风险、成本、轻量替代和删除条件 |
+| WORKBOARD 运行内存瘦身 | workflow | IN_PROGRESS | 已增加终态保留策略及过期 lease、DONE+WORKTREE、终态过量 warning；待 GraphX 当前开发结束后清理存量台账并校准阈值 |
 
 ## 中期（引入协同工具，协议 v2）
 

@@ -4,6 +4,17 @@
 > 项目变更记在各项目工作区；这里只记"团队怎么变的"。
 > 格式：日期 · 类型 · 变更 · 原因。类型：`role` 角色 / `workflow` 流程 / `protocol` 协议 / `template` 模板 / `skill` 技能 / `other`。
 
+## [0.3.1] - 2026-08-25
+### Added
+- `other`：validator 增加过期 lease、无法解析的 lease、`DONE + WORKTREE` 未收口和终态行过量 warning；同类结果聚合输出，避免提示本身制造上下文噪声。
+
+### Changed
+- `workflow`：明确 WORKBOARD 是短期协调视图，只保留非终态项和少量近期终态项；长期历史复用 Git、STATE revision 和权威证据，不增加第二份归档文档。
+- `template`：WORKBOARD 模板补充终态清理入口；终态保留上限由 `team.yaml#governance.workboard.recent_terminal_limit` 配置。
+
+### Migration
+- GraphX 正在其他 session 中开发，本版本不改其项目文件；待当前开发结束后再按 warning 清理存量 lease 和终态行。
+
 ## [0.3.0] - 2026-08-21
 ### Added
 - `workflow`：新增 `team/philosophy.md`，确立“最低充分秩序”、按风险唤醒角色、边界对齐、治理强度随不可逆性提升，以及治理建议的成本/删除审查。

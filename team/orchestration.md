@@ -34,7 +34,7 @@
 4. **认领**：记录 owner、base、scope、lease、验收；然后启动角色。
 5. **评审**：内容由治理矩阵中的 reviewer/approver 处理；orchestrator 检查证据。
 6. **集成**：核对 revision，运行 scoped + baseline 验证，处理冲突。
-7. **交接**：更新 WORKBOARD 与 STATE；只有 publish 授权才执行外部副作用。
+7. **交接**：更新 WORKBOARD 与 STATE；提交产生后把 DONE 项的 `WORKTREE` 补成 revision，并按保留上限移除最旧终态行；只有 publish 授权才执行外部副作用。
 
 ## 并行判定
 

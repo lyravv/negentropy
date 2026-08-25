@@ -17,3 +17,4 @@ updated: YYYY-MM-DD
 - 当前集成者：无
 - 已知重叠范围：无
 - 并发和 lease 规则：`team/concurrency.md`
+- 本表只保留非终态项和近期终态项；终态保留上限见 `team.yaml#governance.workboard.recent_terminal_limit`，长期历史由 Git 与权威证据保存。

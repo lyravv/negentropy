@@ -8,6 +8,7 @@ import json
 import re
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -42,6 +43,8 @@ WORKBOARD_HEADERS = (
 )
 QUESTION_HEADERS = ("编号", "提出角色", "问题", "等待谁", "状态", "决定来源", "验证者", "解决记录")
 CHANGE_HEADERS = ("编号", "提出角色", "目标事实", "批准者", "变更内容", "影响评估", "状态", "实施证据")
+ACTIVE_LEASE_STATUSES = {"CLAIMED", "IN_PROGRESS"}
+TERMINAL_WORK_ITEM_STATUSES = {"DONE", "CANCELLED"}
 
 
 @dataclass
@@ -64,9 +67,12 @@ def is_separator_row(cells: list[str]) -> bool:
 
 
 class Validator:
-    def __init__(self, project: str | None, strict: bool) -> None:
+    def __init__(self, project: str | None, strict: bool, now: datetime | None = None) -> None:
         self.project = project
         self.strict = strict
+        self.now = now or datetime.now(timezone.utc)
+        if self.now.tzinfo is None:
+            raise ValueError("now must include timezone information")
         self.findings: list[Finding] = []
         self.manifest: dict[str, Any] = {}
 
@@ -129,6 +135,10 @@ class Validator:
         team = data.get("team", {})
         if not re.fullmatch(r"\d+\.\d+\.\d+", str(team.get("version", ""))):
             self.error(path, "team.version must be semver X.Y.Z")
+
+        terminal_limit = data.get("governance", {}).get("workboard", {}).get("recent_terminal_limit")
+        if not isinstance(terminal_limit, int) or isinstance(terminal_limit, bool) or terminal_limit < 0:
+            self.error(path, "governance.workboard.recent_terminal_limit must be a non-negative integer")
 
         roles = [role for role in data.get("roles", []) if isinstance(role, dict)]
         role_ids = [role.get("id") for role in roles]
@@ -356,7 +366,17 @@ class Validator:
             return
         allowed = set(self.manifest.get("statuses", {}).get("work_item", []))
         modes = set(self.manifest.get("action_modes", {}))
+        configured_terminal_limit = self.manifest.get("governance", {}).get("workboard", {}).get("recent_terminal_limit")
+        terminal_limit = (
+            configured_terminal_limit
+            if isinstance(configured_terminal_limit, int)
+            and not isinstance(configured_terminal_limit, bool)
+            and configured_terminal_limit >= 0
+            else 10
+        )
         seen: set[str] = set()
+        terminal_ids: list[str] = []
+        done_worktree_ids: list[str] = []
         for row in rows:
             item_id = row["ID"]
             if not re.fullmatch(r"W-[A-Z0-9-]+", item_id):
@@ -370,12 +390,42 @@ class Validator:
                 self.error(path, f"{item_id} has invalid work item status: {status}")
             if row["Mode"] not in modes:
                 self.error(path, f"{item_id} has invalid action mode: {row['Mode']}")
-            if status in {"CLAIMED", "IN_PROGRESS"}:
+            if status in ACTIVE_LEASE_STATUSES:
                 for field in ("Owner", "Base revision", "写入范围", "Claimed at", "Lease until"):
                     if not row[field]:
                         self.error(path, f"active {item_id} missing {field}")
+                lease_until = row["Lease until"]
+                if lease_until:
+                    try:
+                        lease_time = datetime.fromisoformat(lease_until.replace("Z", "+00:00"))
+                    except ValueError:
+                        self.warn(path, f"active {item_id} has an unparseable Lease until: {lease_until!r}")
+                    else:
+                        if lease_time.tzinfo is None:
+                            self.warn(path, f"active {item_id} Lease until must include a UTC offset")
+                        elif lease_time < self.now:
+                            self.warn(path, f"active {item_id} lease expired at {lease_until}; confirm owner before changing scope or status")
             if status == "DONE" and not row["Result revision / Notes"]:
                 self.error(path, f"DONE {item_id} missing result revision/notes")
+            if status in TERMINAL_WORK_ITEM_STATUSES:
+                terminal_ids.append(item_id)
+            result = row["Result revision / Notes"]
+            if status == "DONE" and "WORKTREE" in result and not re.search(r"(?<![0-9a-f])[0-9a-f]{7,40}(?![0-9a-f])", result, re.IGNORECASE):
+                done_worktree_ids.append(item_id)
+
+        if len(terminal_ids) > terminal_limit:
+            self.warn(
+                path,
+                f"WORKBOARD retains {len(terminal_ids)} terminal items (limit {terminal_limit}); "
+                "remove older DONE/CANCELLED rows after STATE and authoritative evidence are updated",
+            )
+        if done_worktree_ids:
+            shown = ", ".join(done_worktree_ids[:5])
+            suffix = "..." if len(done_worktree_ids) > 5 else ""
+            self.warn(
+                path,
+                f"{len(done_worktree_ids)} DONE item(s) still use WORKTREE without a committed revision: {shown}{suffix}",
+            )
 
     def check_open_questions(self, path: Path) -> None:
         text = path.read_text(encoding="utf-8")

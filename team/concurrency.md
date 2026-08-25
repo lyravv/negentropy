@@ -2,8 +2,8 @@
 title: 并发与工作认领协议
 role: orchestrator
 status: APPROVED
-version: 1.0
-updated: 2026-08-21
+version: 1.1
+updated: 2026-08-25
 upstream: [team/governance.md]
 downstream: [projects/*/WORKBOARD.md, team/orchestration.md]
 artifact_type: team-definition
@@ -34,6 +34,15 @@ approval_evidence: 用户要求对正在使用的团队做稳定、实际的全�
 ## 最小工作项字段
 
 `id / title / status / owner / action_mode / base_revision / scope / dependencies / claimed_at / lease_until / acceptance / result_revision / notes`
+
+## 运行内存与收口
+
+`WORKBOARD.md` 是当前协调视图，不是永久审计日志。它保留全部非终态工作项，以及 `team.yaml#governance.workboard.recent_terminal_limit` 规定数量以内的近期 `DONE/CANCELLED` 项；更早的历史由 Git、STATE 指向的 revision 和权威测试/发布证据保存，不另建重复归档文档。
+
+- 工作项进入 `DONE` 时可以暂记 `WORKTREE`，但集成提交产生后必须补成实际 revision，或在 STATE 和权威证据已经更新后删除该终态行。
+- 每次接手和交接都检查过期 lease。过期只触发确认与清理，不转移写权限。
+- 终态行超过保留上限时，从最旧项开始删除；删除前确认它不再承载唯一的未决事项、验证结果或恢复信息。
+- validator 对过期 lease、未收口的 `DONE + WORKTREE` 和终态行过量只报 warning，避免历史债务阻断当前交付。
 
 ## 集成门禁
 
