@@ -1,14 +1,170 @@
 ---
-title: 测试报告 — GX-APP-015/016/017/018
+title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 0.3
-updated: 2026-08-21
+version: 0.9
+updated: 2026-08-28
+artifact_type: test-report
+source_revision: graphx@280d0ef
+approver: test-engineer
+approval_evidence: 58 core/runtime/conformance tests + 8 Candidate-card tests passed; frontend production build and local pi-ai SDK/plugin smoke passed
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
-# 测试报告 — GX-APP-015/016/017/018
+# 测试报告 — GX-APP-015/016/017/018/021..025
+
+## 2026-08-28 W-LOCAL-001 / W-CAND-001 验收
+
+> **结论：通过（APPROVED，部署待复验）**。本地 pi-ai 路由可完成真实调用，GraphX 不发送
+> `max_tokens`；Candidate 已按 Chat 隔离，并成为一次性审批决策：Apply 或继续发言都会
+> 关闭它，终态不会回退到历史卡片，晚到 Reviewer 不会重开。代码已推送为 `280d0ef`；
+> 最新 GX-APP-035 后端仍需重新部署后做 UI/API 冒烟。
+
+| 检查项 | 结果 |
+|---|---|
+| Core/Adapter/Bridge/Executor/Supervisor/Candidate 专项 | `58 passed in 7.20s` |
+| Candidate 卡与决策生命周期模块 | `8 passed in 3.28s`；其中继续发言 reject、Apply 关闭旧提案 4 项核心用例 `4 passed` |
+| `npm run build` | TypeScript + Vite production build 通过，28 modules transformed |
+| JSON/YAML 与 diff | requirements/model/lock JSON、manifest/Cordis YAML、`git diff --check` 通过 |
+| 本地模型真实 smoke | 纯 SDK 返回 `LOCAL_OK`；完整 GraphX plugin smoke passed，产生类型化回执 |
+| 全量 pytest | 未重跑，不声明结果；TestClient chat-lifecycle 路径仍可在本环境长时间停滞 |
+
+残余风险：最近真实 Builder 构图虽然最终成功并 Apply 到 v2，但两次先行失败及成功轮回执
+包含多次 `TOOL_ARGUMENT_SCHEMA`、30 秒 bridge timeout、重复 HGT 校验与非必要 Bash；
+本轮没有把该运行时可靠性问题声明为已修复。
+
+## 2026-08-25 W-FIX-002 Candidate 门禁与实时 Harness 步骤验收
+
+> **结论：通过（APPROVED）**。Candidate 在 GraphX/Reviewer 协调完成前不可 Apply；
+> Harness 公开通知被实时净化为任务卡步骤，且不暴露私有推理或原始工具 payload；
+> `max-tokens` 使用精确终止码，role-completion observation 被约束为立即 typed decision。
+
+| 检查项 | 结果 |
+|---|---|
+| Adapter/Executor/Activity/DAG/Cancel 专项 | 22 passed，4.54 秒 |
+| `npm run build` | TypeScript + Vite production build 通过 |
+| 真实 DeepSeek Harness rc6 smoke | Builder/Reviewer/Tester 均 `finish_reason=completed`；新 JSONL 协议兼容 |
+| 部署 | `graphx-alpha.service` active；health 通过 |
+| 数据保留 | Graph `111` 与 1 个数据连接保留 |
+
+追加复验关闭 BUG-011：新 Builder 未产出 Candidate 时不再显示历史失败候选；UTC
+时间正规化后运行时长从 0 秒递增；缺少结果 call ID 时使用待处理调用安全关联公开工具名。
+相关前端/Adapter专项 `13 passed in 2.33s`，production build 通过并已重部署。
+
+二次追加复验关闭 BUG-012：真实运行中 Builder Candidate 已成功产生，后置 GraphX 也已
+提交 `supervisor_decision`，但 Adapter receipt 枚举漏项导致成功结果被误报协议失败。统一
+契约并新增 Supervisor receipt 回归后，Adapter/Harness/DAG 专项 `16 passed in 1.25s`；
+8001 已重部署且 health 通过。
+
+全量 TestClient 套件仍复现既有 Starlette/httpx2 路径挂起，因此不声明全量结果。
+
+## 2026-08-25 W-FIX-001 运行时修复验收
+
+> **结论：通过（APPROVED）**。部署服务显式继承代理；Harness 的
+> `TRANSPORT` 以 `HARNESS_TRANSPORT` 净化透传；GraphX observation 失败不再伪造
+> completed；后置卡片按 parent final 因果排序；取消任务在 Candidate 持久化前执行
+> execution-version fence。
+
+| 检查项 | 结果 |
+|---|---|
+| Harness/Executor/Supervisor/Activity/Cancel 相关专项 | 30 passed，4.98 秒 |
+| `npm run build` | TypeScript + Vite production build 通过 |
+| 真实 DeepSeek Harness rc6 smoke | `finish_reason=completed`，预期输出哈希匹配 |
+| 部署 | `graphx-alpha.service` active；代理变量脱敏核验已配置；health/bootstrap 通过 |
+| 数据保留 | Graph `111` 与 1 个数据连接保留 |
+
+全量 TestClient 套件仍在既有 Starlette/httpx2 路径停滞，因此不声明全量结果；这不
+改变上述 30 个相关自动化用例和真实 Harness smoke 的通过结论。
+
+## 2026-08-24 第二轮反馈验收 — GX-APP-021..025
+
+> **结论：通过（APPROVED）**。Stop/持久取消与 late-result fence、逐 Agent
+> 过程卡与最终气泡顺序、Build Mode 权限式路由、Graph 绑定受控只读查询和前端统一
+> endpoint/poll/stop 均通过专项验收。初验发现的通用表规划限制及多表歧义异常
+> （BUG-006）已修复并复验关闭。
+
+### 执行证据
+
+| 检查项 | 结果 |
+|---|---|
+| GX-APP-021..025 + Harness cancel 专项 | `23 passed in 3.64s`，退出码 0；另有 1 条既有 Starlette/httpx deprecation warning |
+| `npm run build`（`apps/web`） | TypeScript + Vite 通过；28 modules transformed；1.16 秒；退出码 0 |
+| `git diff --check` | 通过，无 whitespace error |
+| 全量 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q` | 运行 3 分钟仅输出 5 个进度点且无后续进展，按约定 Ctrl-C（退出码 130）；不计为通过或失败 |
+
+### 独立审查结果
+
+- GX-APP-022：取消 API 幂等；`execution_version` 与 `cancel_requested_at` 在每个晚到
+  写入边界拒绝 stale 结果；取消 Build 不生成 Candidate，正式 Graph/revision 不变；
+  Harness 进程按 run ID 注册，取消执行 terminate、宽限后 kill，并在完成/超时/取消后清表。
+- GX-APP-021/023：Builder card → Builder final → Reviewer card → Reviewer final 的锚点
+  由 `final_message_id` 保持；普通问答为 GraphX card → final。公开事件严格限于
+  `thinking_summary/tool_call/tool_result/status`，projection 对 payload 二次白名单，未发现
+  CoT、prompt、token、secret、credential、authorization 或 raw tool payload 泄露。
+- GX-APP-024：前端统一调用 message routing endpoint；Build Mode on 仅授予 mutation
+  权限，信息问答保持 read-only，混合/确认型请求澄清且不建 Candidate，off 时不改图。
+- GX-APP-025：查询输入只生成结构化 server-owned plan，不接受模型 raw SQL；从当前
+  HGT 动态解析任意绑定表，歧义失败关闭；连接须属于同一 Graph，表/列越权拒绝；
+  read-only transaction、statement timeout、row/byte cap、敏感字段 redaction 和净化错误
+  均有实现或专项证据。随机销售订单成功路径及第三张任意表规划均已覆盖。
+
+### 残余风险
+
+- 全量套件在本环境 3 分钟无进展，未取得全量通过证据；本结论基于本轮 23 个相关
+  自动化用例、静态契约/实现审查、前端生产构建与 diff check。
+- 受控 SQL 的真实 PostgreSQL 网络端到端未在本轮测试环境执行；执行边界以 fake
+  engine/服务级用例与代码审查验证，部署后仍应对真实绑定数据源做 smoke test。
+
+## 2026-08-24 增量验收 — GX-APP-021
+
+### BUG-005 修复复验
+
+> **结论：通过（APPROVED）**。`AgentActivityCard` 已改为 `useState(false)`，首次
+> 渲染保持紧凑；紧凑摘要直接列出任意数量 Agent 的 `display_name` 与六态标签，
+> 用户无需展开即可知道各 Agent 状态。`active → terminal` 仅在状态边沿自动折叠，
+> 不会在 active 期间覆盖用户主动展开。复验执行 `npm run build`：TypeScript + Vite
+> 通过，28 modules transformed，1.14 秒，退出码 0；`git diff --check` 通过。
+> BUG-005 已关闭，GX-APP-021 本轮可交付。
+
+> **初验结论（已由上述复验取代）：需修改（CHANGES_REQUESTED）**。后端活动状态机与前端生产构建通过，
+> 但活动任务首次渲染时被默认展开，不满足 GX-APP-021“卡片 MUST compact by
+> default”的明确要求；见 BUG-005。
+
+### 执行证据
+
+| 检查项 | 结果 |
+|---|---|
+| `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/conformance/test_agent_activity_card.py` | 5 passed，1.96 秒，退出码 0；另有 1 条既有 Starlette/httpx deprecation warning |
+| `npm run build`（`apps/web`） | TypeScript + Vite 通过，退出码 0；28 modules transformed |
+| `git diff --check` | 通过，无 whitespace error |
+| 既有 TestClient 相关回归组合 | 运行 60 秒无输出，人工中断（退出码 130）；不计为通过或失败 |
+
+### 独立审查结果
+
+- 通过：`TaskActivity` 以 `trigger_message_id` 锚定 user message，React 在该 message
+  的 `message-group` 内紧邻插入卡片；后端在阻塞 Harness 前的独立事务提交 Builder
+  `running` / Reviewer `queued` 初态。
+- 通过：公开模型和前端组件均为任意 Agent 数组；专项测试实际注入并观察 Builder
+  与 Tester 同时 `running`。六态类型/合同完整，Builder、Reviewer 成功、Builder
+  失败与 Reviewer 失败均闭合；`changes_requested` 正确视为 Reviewer 执行完成。
+- 通过：Bootstrap 按所选 `thread_id` 隔离，倒序取最近 20 条后恢复正序；公开 payload
+  采用字段白名单；Graph 删除顺序先清 AgentActivity/TaskActivity；Trace ID 仅在对应
+  阶段可读后写入。
+- 通过：轮询为串行 await 的单飞 Bootstrap，请求间隔 750 ms；Graph/Chat 切换和卸载
+  通过 token 取消旧循环，请求序号防止旧 Bootstrap 覆盖新选择，Build resolve/reject
+  后执行最终刷新。
+- 不通过：`AgentActivityCard` 使用 `useState(active)`，新活动任务 `active=true` 时首次
+  渲染即展开详情，与 GX-APP-021“compact by default”冲突；终态自动折叠本身正确。
+
+### 测试质量与残余风险
+
+新增 5 个 service-direct 用例覆盖主状态转换、多 running、失败净化、
+`changes_requested` 与空工作台，质量可接受但不足以独立防回归：尚无自动化断言覆盖
+前端“紧邻触发消息 / 默认折叠 / 750 ms 单飞与取消”，也未用专项测试直接断言
+thread 隔离、最近 20 条和删除后的子表计数。上述后端项本轮以代码审查确认；前端
+默认折叠已因此漏测并形成 BUG-005。修复后至少应增加可执行的前端组件/轮询测试，
+再将本轮结论改为 APPROVED。
 
 > 本报告取代 v0.2（GX-INGEST-006）测试报告；旧报告结论已并入缺陷日志回归结论。
 

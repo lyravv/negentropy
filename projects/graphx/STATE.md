@@ -2,8 +2,8 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.0
-updated: 2026-08-21
+version: 2.4
+updated: 2026-08-28
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
@@ -23,14 +23,14 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，base `cf7f9e0` + **WORKTREE**；现有修改受保护，未声明已推送） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，`280d0ef`，已推送 origin） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | 阶段 4（实现）+ 阶段 5（测试）已交付用户反馈修复轮（GX-APP-015/016/017/018）；阶段 6（发布）待用户在宿主机执行重新部署 |
-| 测试状态 | **全量 154 passed + 12 subtests 全绿**（2026-08-21 重跑，含 GX-APP-015/016/017/018 4 条合规用例） |
-| 运行应用 | `http://10.54.56.113:8001/`（**跑的是旧代码**，本轮 5 条修复生效需用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`，见阶段 6） |
-| 下一步 | ① 用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`（重新部署 + 清空全部现有 Graph，用户已授权）② 部署后复验 5 条反馈 ③ 关闭 Q-002/OQ-016 凭据隔离门禁（Builder 实跑前置）④ 用已绑定套件执行 30 条盲评并冻结 Tester 输出 |
+| 当前阶段 | 阶段 4–5 完成：Supervisor、内网本地模型、Chat-scoped Candidate 与一次性审批决策已提交；阶段 6 待部署最新 revision |
+| 测试状态 | `280d0ef` 核心/运行时/合规专项 **58 passed**，Candidate 卡专项 **8 passed**，TypeScript/Vite production build 通过；本地 pi-ai 纯 SDK 与完整 GraphX plugin smoke 已通过；未声明全量 pytest |
+| 运行应用 | `http://10.54.56.113:8001/`（此前已部署本地模型与 GX-APP-034；当前沙箱无法复核 user service，`280d0ef` 的 GX-APP-035 后端需重新部署） |
+| 下一步 | 重新部署 `280d0ef` 并复验：Apply 后卡片消失；未 Apply 而继续发言时 Candidate 变为 `rejected` 且旧卡不回流；随后收敛 Builder 工具 Schema/30 秒桥接超时问题 |
 
 ## 项目批准者
 
@@ -50,15 +50,91 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **部分完成** | 用户反馈修复轮（GX-APP-015/016/017/018）已交付；真实 Builder 会话被 OQ-016 阻塞 |
-| 5 测试 | test-engineer | **部分完成** | 本轮 4 条合规用例 + 全量 154 passed 通过；**30 条业务盲评运行时执行 + 输出冻结未做** |
-| 6 发布 | devops-engineer | **进行中** | `scripts/redeploy_alpha.sh` 已就绪，已在 8002 临时实例验证 5 条行为；**待用户在宿主机执行 `--clear-graphs`**（沙箱无法 signal 宿主机进程）；Postgres 迁移未做 |
+| 4 实现 | frontend ∥ backend | **本轮完成** | 本地 pi-ai 模型、GX-APP-034 Chat 隔离、GX-APP-035 一次性 Candidate 决策与 late Reviewer 终态保护已提交 |
+| 5 测试 | test-engineer | **本轮完成** | 58 个核心专项、8 个 Candidate 卡专项与前端 production build 通过；完整全量未重跑 |
+| 6 发布 | devops-engineer | **待更新** | 先前本地模型/GX-APP-034 部署曾通过；`280d0ef` 已推送但最新 GX-APP-035 后端尚未重启验证 |
 | 7 复盘 | orchestrator | 未开始 | |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
 ## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
+
+### 2026-08-28 · W-LOCAL-001 / W-CAND-001 本地模型与 Candidate 决策生命周期
+
+GraphX 已切换到内网 OpenAI-compatible `/models/DeepSeek-V4-Flash-0731`，不发送
+`max_tokens`。固定 rc6 SDK 未打包桌面端 `settings-file` / `credentials-local` 插件，原装
+挂载方案会在 Cordis 初始化阶段超时；当前通过 bundled `llm-pi-ai` 直接声明 `local` route，
+worker 仅注入无鉴权端点所需的固定非敏感占位值。纯 SDK 返回 `LOCAL_OK`，完整 GraphX
+plugin smoke 完成并产生类型化工具回执；架构决策记录在 GraphX `ADR-008`。
+
+Candidate 投影先以 GX-APP-034 绑定 originating `BuildRun.thread_id`，杜绝跨 Chat 卡片泄漏；
+GX-APP-035 进一步把审批卡定义为一次性待处理决策：Apply 后关闭，同一 Chat 未 Apply 而
+继续发送消息时，服务端在接收新 turn 的事务中把所有开放 Candidate 标为 `rejected`；前端
+只读取最新 Candidate，不再回退到旧 `proposed`，晚到 Reviewer 也不能重开终态。实现、
+规范、测试已提交并推送为 GraphX `280d0ef`。
+
+最近真实构图最终成功生成 2 节点、45 字段、1 条边并 Apply 到 v2，但此前两次 Builder
+失败的回执显示本地模型多次产生 `TOOL_ARGUMENT_SCHEMA`，并触发多次精确 30 秒 bridge
+timeout；成功轮仍有重复校验和一次 120 秒非必要 Bash。该效率/可靠性问题尚未修复，列为
+下一轮运行时收敛项。
+
+### 2026-08-25 · W-FIX-002 Candidate 时序与真实执行步骤
+
+复现确认 Builder 已提交 Candidate 后，GraphX observation 仍运行时前端提前显示了可 Apply
+按钮；随后 observation 因 `max-tokens` 被泛化为 `HARNESS_FINISH_UNSUPPORTED`。同时 worker
+只在结束时返回汇总，SDK 的实时 notification 未进入任务卡。现已交付：Builder Candidate
+先持久化为 `proposed`；必须等待任务谱系收敛且同哈希 Reviewer 报告 passed 才启用 Apply；
+worker 使用公开 `on_notification` 回调流式输出版本化净化 JSONL，Adapter 校验后实时持久化
+`thinking_summary/tool_call/tool_result`；展开卡片独立滚动；工具参数、原始结果、assistant
+chunk 和隐藏推理全部丢弃；GraphX role-completion prompt 要求立即提交一次 typed decision，
+预算增至 4096，`max-tokens` 映射为 `HARNESS_MAX_TOKENS`。8001 已重部署并保留现有数据。
+后续试用发现新 Builder 启动时全局 Candidate 区仍读取上一轮失败候选，且 SQLite UTC
+naive 时间被浏览器按本地时间计算为 480 分钟；现已追加轮次隔离和 UTC 正规化修复并部署。
+真实试用进一步确认 Builder 已成功提交 Candidate，而后置 GraphX 已调用
+`supervisor_decide` 生成 typed decision；Adapter 的 artifact receipt 枚举却漏掉
+`supervisor_decision`，导致完成结果在协议校验阶段被误报为 `WORKER_PROTOCOL_SCHEMA`。
+现已统一 Bridge/Adapter 契约、增加 Supervisor receipt 回归并再次部署 8001。
+
+### 2026-08-25 · W-FIX-001 Builder 运行时与卡片因果顺序修复
+
+干净 Graph/重连数据源后复现证明旧消息不是原因。Harness 私有会话显示 Builder 与
+后置 GraphX 均因 DeepSeek `TRANSPORT` 在重试后失败；手工创建的 systemd transient
+unit 未携带代理环境。现已交付：部署脚本显式传递 allowlisted GraphX/proxy 环境并使用
+持久 user service；worker/Adapter 将 `TRANSPORT` 净化为 `HARNESS_TRANSPORT`；GraphX
+observation 失败不再伪造成静默 completed；前端将 observation 锚定到父角色 final 后；
+统一入口取消时在 Candidate 持久化前执行 execution-version fence。部署后真实 Harness
+rc6 冒烟 `completed`，服务保留 Graph `111` 和 1 个连接。
+
+### 2026-08-25 · 当前最高优先级：Supervisor + 动态多 Agent 重构
+
+用户已批准以下不可变边界：
+
+1. GraphX 是无 mention 时的唯一默认入口；不使用关键词/意图枚举预路由到固定 pipeline。
+2. Build Mode 仅是能力授权：关闭时只能激活 GraphX，不能创建其他角色会话、Candidate 或修改 Graph；开启时才允许 GraphX/用户激活 Builder、Reviewer、Tester。
+3. 用户可在群聊中 `@GraphX`、`@Builder`、`@Reviewer`、`@Tester`；指定角色完成后触发一次 GraphX Supervisor turn，由 GraphX 决定静默结束、汇总、澄清或继续委派。
+4. Builder、Reviewer、Tester 是目的和工具权限不同的独立 Agent，不是固定阶段；允许 Builder↔Reviewer 返工循环、Tester 先审计当前 Graph 后触发 Builder、并行任务等动态任务图。
+5. 上下文采用 Harness/Codex 风格的共享任务上下文 + 独立角色 session/workspace/checkpoint；角色间只共享公开消息、受控 Context Pack 与 typed artifact，不共享隐藏推理或私有 session。
+6. SQL/Graph/File/外部系统能力全部作为 Harness plugin 或 MCP 风格工具进入统一 Tool Gateway；删除主链路上的 SQL 问句识别和关键词 route。
+7. Apply 永远由用户明确确认；动态 Agent 也不得直接写正式 Graph revision。
+
+上一轮 W-FBK 的 Task/Event、Stop、execution-version fence、typed artifacts、Harness plugin
+和 Graph-bound SQL 安全执行层保留为基础设施；关键词分类主链、固定 route enum、公开旧
+`/build` API 与固定 Builder→Python Reviewer 编排已经由 W-SUP-001..008 替换。
+
+### 2026-08-24 · 当前最高优先级：任务运行体验第二轮
+
+1. **任务停止**：运行中提供 Stop；服务端持久化取消请求并尽快终止/跳过尚未完成阶段，Candidate/正式 Graph 不得因取消而写入。
+2. **逐 Agent 过程卡**：Builder、Reviewer、GraphX 各自在自己的消息位置下展示安全公开的工作摘要、工具调用名/状态与净化回执；最终结论仍用普通气泡。不得暴露隐藏推理链、系统 prompt、token、secret 或原始工具 payload。
+3. **统一意图路由**：Build Mode 表示允许图变更，不表示每条消息强制 Build；图上问答在任一模式均可进入只读 GraphX，只有明确变更意图才进入 Builder/Reviewer。
+4. **受控 SQL 查询**：普通问答支持对 Graph 已绑定数据源/表执行只读、限时、限行 SQL，并把净化后的工具过程呈现在 GraphX 过程卡；不得允许任意数据源、写 SQL 或秘密外泄。
+5. **顺序**：产品/架构契约 → 取消与运行事件 → 意图路由 → SQL 工具 → 前端整合 → 独立回归；发布仍需单独 `publish` 授权。
+
+交付状态：上述 1–4 已实现并包含在 graphx `280d0ef`；GX-APP-021..025 登记为
+`implemented`。独立测试专项 23 passed、前端生产构建通过，BUG-006（查询表硬编码及
+歧义空计划运行时错误）已修复。全量 pytest 因当前环境 3 分钟仅推进 5 项而中止，
+不计通过或失败。该轮曾按用户明确授权部署到 8001，健康检查、bootstrap、取消/消息
+OpenAPI 路由和前端资源冒烟通过；最新部署状态以本页 30 秒速览为准。
 
 1. **（当前门禁）** 实现 out-of-sandbox credential broker（或等价 UID/mount 隔离），证明真实 provider Token 对 Agent/Bash 不可读，关闭 Q-002/OQ-016。
    - 角色：devops-engineer（隔离实现）+ architect（安全边界确认）+ test-engineer（对抗验证）。
@@ -97,6 +173,14 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 > 见 `team/handoff.md` §4，对所有项目通用，此处不重复。
 
 ## 本轮已交付（阶段 4–5，GX-APP-012/013/014）
+
+### 2026-08-24 · 连续 UI 反馈轮（GX-APP-019/020 + 栏交互）
+
+- `0e41859`：重新部署/清理脚本 fail-closed，精确停止 8001 监听进程并验证 DELETE 路由。
+- `7868da4` + `404efc7`：首条 query 生成 Chat 标题，历史 `新 Chat` 启动回填；输入框附件进入当前 Chat myspace。
+- `ef3541e`：Graphs/Chats 收起交互统一，收起后整条竖栏是唯一展开区域。
+- `568e63d`：附件选择器支持一次多选，批量上传后刷新 myspace 并预览最后成功文件。
+- 以上均已推送 `origin/feat/trusted-build-core`；各轮 scoped pytest 与 TypeScript/Vite build 通过，未重跑全量 baseline。
 
 ### 2026-08-21 · GX-INGEST-006
 
@@ -148,12 +232,14 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 - 组织库无 Add/删除/更新端点（Add 弹窗仅只读展示）；重复推送不去重。
 - 画布合规测试为源码级断言（锁定渲染形态不回退），非 DOM 级视觉验证。
 - 推送后本地副本归属为产品决策（`spec/07` OQ-017，默认保持 `Mine · editable`）。
-- 应用 `10.54.56.113:8001` 跑旧代码，本轮 5 条修复生效需用户在宿主机执行 `scripts/redeploy_alpha.sh --clear-graphs`（阶段 6，devops）。
 - 前端 `pushGraph`/`send` 失败路径的 toast 同样会被后续 `refresh()` 清除（与本轮已修复的 `deleteGraph` 同型），留作后续项。
-- 真实 provider 的 agent-chat（GX-APP-017）与多轮 design Build（GX-APP-016）本轮以确定性 fake harness 验证；真实 DeepSeek Harness 端到端为后续项。
+- 本地模型已可真实调用，但复杂 Builder 工具参数仍会出现 `TOOL_ARGUMENT_SCHEMA` 与
+  30 秒 bridge timeout；需要完整工具 JSON Schema、运行时禁用非 GraphX 工具和更真实的
+  公开错误投影。
+- GraphX `280d0ef` 已推送；GX-APP-035 的最新后端行为尚待重启 8001 后验证。
 
 ## 续接指针
 
 - **Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定**：见 `team/handoff.md`（团队能力单一事实源）。
 - **工作认领 / lease / 写入范围**：见 `projects/graphx/WORKBOARD.md`；开始下一项写任务前先认领。
-- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`（当前 **154 passed + 12 subtests**，2026-08-21 验证，base `db3d118` + 本轮 WORKTREE）。
+- **本项目基线命令**：`cd /home/wangling/develop_team/graphx && UV_CACHE_DIR=/home/wangling/develop_team/.cache/uv uv run pytest -q`。最近验证为 `280d0ef` 的 58 个核心专项、8 个 Candidate 卡专项与前端 production build；未重跑全量 baseline。
