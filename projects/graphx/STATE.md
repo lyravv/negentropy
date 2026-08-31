@@ -2,8 +2,8 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.4
-updated: 2026-08-28
+version: 2.5
+updated: 2026-08-31
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
@@ -22,15 +22,16 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 
 | 项 | 值 |
 |---|---|
-| 项目 | GraphX（Graph-first 超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，`280d0ef`，已推送 origin） |
+| 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `d46a33e`，比 origin 领先 1 commit） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | 阶段 4–5 完成：Supervisor、内网本地模型、Chat-scoped Candidate 与一次性审批决策已提交；阶段 6 待部署最新 revision |
-| 测试状态 | `280d0ef` 核心/运行时/合规专项 **58 passed**，Candidate 卡专项 **8 passed**，TypeScript/Vite production build 通过；本地 pi-ai 纯 SDK 与完整 GraphX plugin smoke 已通过；未声明全量 pytest |
-| 运行应用 | `http://10.54.56.113:8001/`（此前已部署本地模型与 GX-APP-034；当前沙箱无法复核 user service，`280d0ef` 的 GX-APP-035 后端需重新部署） |
-| 下一步 | 重新部署 `280d0ef` 并复验：Apply 后卡片消失；未 Apply 而继续发言时 Candidate 变为 `rejected` 且旧卡不回流；随后收敛 Builder 工具 Schema/30 秒桥接超时问题 |
+| 当前阶段 | **可用性收敛（阶段 0 重置）**：内核/控制面大量能力已实现，但真实“连接数据源→构建节点→受控查询验证→Review/Test→Apply”主旅程未稳定 |
+| 测试状态 | conformance 清单 79 implemented / 15 planned；2026-08-31 核心组合回归前 39 项快速通过后长时间无进展并中止，不声明全量通过 |
+| 真实运行证据 | 当前库中 Builder 近期 9 次尝试约 3 次产生 Candidate、6 次失败；最新两次失败均未产生 Candidate，核心为工具 Schema/实体 hash/错误详情/SQL binding 契约缺口 |
+| 运行应用 | `50119b2` 已于 2026-08-31 19:06 重新部署到 8001；`/health` 返回 `ok/graphx-alpha`，user service active，现有 Graph/Chat/DB 保留；历史单连接资源目录在 Builder 上下文中解析为明确 connection_id |
+| 下一步 | W-USABLE-002 正在收口：实体 hash→完整工具 Schema→脱敏字段错误→工具预算/重试门禁；团队并行准备 W-USABLE-003 的按节点多数据源绑定、歧义澄清与 Candidate/Revision SQL 验证 |
 
 ## 项目批准者
 
@@ -50,15 +51,50 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **本轮完成** | 本地 pi-ai 模型、GX-APP-034 Chat 隔离、GX-APP-035 一次性 Candidate 决策与 late Reviewer 终态保护已提交 |
-| 5 测试 | test-engineer | **本轮完成** | 58 个核心专项、8 个 Candidate 卡专项与前端 production build 通过；完整全量未重跑 |
-| 6 发布 | devops-engineer | **待更新** | 先前本地模型/GX-APP-034 部署曾通过；`280d0ef` 已推送但最新 GX-APP-035 后端尚未重启验证 |
-| 7 复盘 | orchestrator | 未开始 | |
+| 4 实现 | frontend ∥ backend | **重新打开** | 优先修复真实 Builder 工具契约和数据源/查询闭环；现有未提交绑定修改受保护 |
+| 5 测试 | test-engineer | **重新打开** | 组件测试不再替代真实 E2E；建立可重复的数据源→Query→Apply smoke |
+| 6 发布 | devops-engineer | **BLOCKED** | 在 W-USABLE-001..004 通过前不发布；发布后必须用真实数据连接复验 |
+| 7 复盘 | orchestrator | **DONE** | 2026-08-31 完成项目目标/完成度/不可用断点复盘；用户确认 SQL 验证应前置 |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
 ## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
+
+### 2026-08-31 · 可用性收敛里程碑（当前最高优先级）
+
+产品近期唯一主旅程收缩为：
+
+```text
+建立并验证数据连接
+  → Builder 产生显式绑定 connection_id/schema/table 的 Candidate
+  → 对 Candidate preview 和 Apply 后 Revision 执行同一受控查询验证
+  → Reviewer/TestReport 绑定精确 Candidate hash
+  → 用户 Apply
+  → 重启后仍可查询
+```
+
+产品决策：**SQL 工具是节点可用性验证的基础设施，不是后续增强。**
+`table` 节点只有在当前 Revision 中显式绑定同 Graph、`connected`、
+`database` 连接，并能通过服务端限权查询时，才能被宣称为可用节点。
+
+多数据连接是正常产品场景：连接及其资源目录归 Graph 所有，是构建输入；
+SourceTable/API resource 必须保留 `connection_id`。Builder 根据目录来源创建节点，
+节点再记录构建后的可执行来源。只有目录缺失归属、来源冲突或无法唯一匹配时
+才请求澄清；不能把常规逐节点选连接的负担推给用户，也禁止按创建时间、
+所谓“默认连接”或任意顺序猜测。
+被正式 Revision 或开放 Candidate 引用的连接禁止直接删除，必须先经 Candidate
+迁移或解绑引用节点。
+
+实施顺序：
+
+1. **W-USABLE-001 · 绑定不变量收口**：审查、补齐并提交当前 GX-APP-036/GX-CANVAS-002 未提交工作；统一 Bundle/Patch/应用层的连接字段契约。
+2. **W-USABLE-002 · Builder Patch 可构造性**：`graph_context_get` 返回实体 hash；`candidate_submit_patch`/`hgt_validate` 暴露完整 Schema；Bridge 返回脱敏字段级错误；禁止盲目重试耗尽额度。
+3. **W-USABLE-003 · Graph 资源目录与 Query 验证前置**：建立 GraphConnection→SourceTable/API resource 目录归属，Builder 依目录构图并让节点保留来源绑定，目录歧义才澄清；拒绝删除仍被 Revision/Candidate 引用的连接；为 GraphX、Builder、Reviewer、Tester 按最小权限装配同一 `graph_sql_query` backend；支持 Candidate preview 和正式 Revision 绑定；保持结构化 SELECT-only、字段允许列表、超时、行/字节上限和脱敏。
+4. **W-USABLE-004 · 固定 E2E 门禁**：以销售订单+发货申请两表建立自动 smoke，验收 Candidate 查询、Review/Test、Apply、Revision 查询和重启持久性；解决 TestClient/全量测试挂起。
+5. **W-USABLE-005 · 部署与真实试用**：仅在 001–004 通过后发布；连续执行 10 次主旅程无人工修补，记录脱敏 trace 和成功率。
+
+暂停：新 Agent 角色、Supervisor 扩展、组织库、Canvas 新交互、新 HGT 节点类型、图/向量数据库选型。
 
 ### 2026-08-28 · W-LOCAL-001 / W-CAND-001 本地模型与 Candidate 决策生命周期
 
