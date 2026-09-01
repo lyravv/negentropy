@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.7
+version: 2.8
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `829ddd5`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署功能提交 `856755d`；诊断脚本 HEAD `21a7be5`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **语义构图边界已交付，回到可用性 E2E**：Semantic Change→Resolver→Patch Compiler→Candidate 已真实跑通 |
-| 测试状态 | 语义/网关/诊断/协调专项 51 passed + 13 subtests；非 HTTP 核心回归 149 项通过后停在既有 HTTP TestClient 挂起点；前端 build 通过 |
-| 真实运行证据 | `agent-task-1d3404eb7a754a78804ead1694d7a285` 仅调用 `graph_semantic_context_get`→`graph_propose_changes`，生成两个节点资源重绑 Candidate；Reviewer、Tester、GraphX finish 全部完成 |
-| 运行应用 | `829ddd5` 已部署到 8001，健康；现有 Graph/Chat/DB 保留；真实 Candidate 为 ready，未代替用户 Apply |
-| 下一步 | W-USABLE-004：禁止 Tester 通过 native Bash/连接文件绕开受控查询，修复 HTTP TestClient 挂起，再做 Candidate 查询→用户 Apply→Revision 查询→重启固定 E2E |
+| 当前阶段 | **受控 Candidate Preview 查询边界已交付，进入重复可用性评估**：产品角色 typed-tool-only，Tester 不再有 Bash/本地文件旁路 |
+| 测试状态 | 本轮核心/规范专项 39 passed；完整套件在正确宿主线程环境中 244 passed、8 个已移除旧 `/build` API 测试失败（历史测试债务，不恢复旧管线） |
+| 真实运行证据 | 用户已 Apply 并成功随机查询销售订单；合成真实 Harness context/Candidate smoke 均完成，Builder 只调用 `graph_semantic_context_get`→`graph_propose_changes`，未访问数据库 |
+| 运行应用 | GraphX 功能提交 `856755d` 已部署到 8001，PID `2761723`，健康；现有 Graph/Chat/DB 保留；`21a7be5` 仅更新 smoke 脚本无需重启 |
+| 下一步 | W-USABLE-004：补真实 Candidate Preview `graph_sql_query`（不 Apply）门禁；迁移 8 个旧 `/build` 测试；随后 W-USABLE-005 做不自动 Apply 的 10 轮语义构图/查询评估 |
 
 ## 项目批准者
 
@@ -91,8 +91,20 @@ Graph-owned catalog 注入真正的 connection binding 和 evidence。
 2. **W-SEM-004 DONE**：脱敏 root-cause 链已持久化；真实 update Candidate 在两次工具
    调用内成功。真实运行又发现 Supervisor 会复制坏 artifact hash，已由 `829ddd5`
    改为服务端绑定协调身份，第二轮 Reviewer→Tester→GraphX finish 完整通过。
-3. 回到 **W-USABLE-004**。真实 Tester 虽完成数据库验证，但使用 native Bash 读取连接
-   文件并直连数据库，而不是唯一通过 `graph_sql_query`；这是下一轮必须封闭的权限绕行。
+3. **W-USABLE-004 安全边界已封闭**：ADR-010/PD-042 取代“保留 Bash”的旧决定；产品
+   Cordis composition 移除 Bash/subprocess/local-file，RoleProfile `native_tools=()`；Tester
+   获得 exact Candidate ID/hash 的受控 SQL binding，服务端重算 artifact hash、应用 persisted
+   Patch 得到 Preview 并复验 connector scope。真实合成语义工具 smoke 已通过。
+
+### 2026-09-01 · 当前执行切片
+
+1. **W-USABLE-004a**：在隔离测试 Graph/临时元数据上执行真实 Candidate Preview
+   `graph_sql_query`，证明 Tester 不 Apply 也能读到 Preview 绑定的数据；不得读取连接文件。
+2. **W-TEST-DEBT-001**：把 8 个仍请求已删除 `/api/v1/alpha/graphs/{id}/build` 的测试迁移
+   到统一 Chat message + structured mention/Build capability；禁止为了测试绿恢复旧固定管线。
+3. **W-USABLE-005**：连续 10 轮运行“语义 Context→proposal→Candidate/diagnostic”评估，
+   统计一次成功率、工具调用次数、schema/clarification/error code；未经用户逐次确认不自动 Apply。
+4. 根据失败分布再优化 prompt/schema/tool receipt；在已有证据前不新增 Agent 角色、节点类型或 UI。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 
