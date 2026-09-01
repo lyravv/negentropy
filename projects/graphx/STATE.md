@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.3
+version: 3.5
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `9bea7fe`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，W-FLOW-002 HEAD `369c7ff` 待部署） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **首轮查询产品化、可观测性和开放表达评测闭环完成**：下一阶段把诊断带到 UI，并扩大数据库失败与表达覆盖 |
-| 测试状态 | **261 passed + 13 subtests，全量 exit 0**；GX-QUERY-006、GX-OBS-001、GX-EVAL-005 均已通过 conformance/contract |
+| 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
+| 测试状态 | **262 passed + 13 subtests，全量 exit 0**；GX-APP-042 五表 Graph-owned 目录已通过 conformance |
 | 真实运行证据 | 6 场景/7 轮自然语言查询评测最终 6/6 通过；缺失节点不替换、纠正后恢复、读写混合不变更 Graph/Candidate；此前 10/10 语义构图 smoke 通过 |
 | 运行应用 | `9bea7fe` 已部署到 8001，PID `3470963`，健康；20-path OpenAPI；2 Graph/1 connection/5 Candidate 均保留 |
-| 下一步 | **W-DIAG-UI-001** 工作台失败诊断入口；**W-EVAL-003** 扩大 SQL 超时/脱敏/方言与自然表达评测，依据分类结果再改工具或提示词 |
+| 下一步 | **W-FLOW-003** 语义超边 Resolver/Compiler；随后 W-FLOW-004 关系数据验证、W-FLOW-005 团队提示词、W-FLOW-006 完整真实闭环 |
 
 ## 项目批准者
 
@@ -51,8 +51,8 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **ACTIVE** | 查询/诊断后端已完成；下一实现切片为诊断 UI |
-| 5 测试 | test-engineer | **ACTIVE** | 首轮 W-EVAL-002 已完成；继续扩大 SQL failure/redaction 与表达覆盖 |
+| 4 实现 | frontend ∥ backend | **ACTIVE** | 当前主线为完整场景所需资源目录、语义超边和关系验证工具 |
+| 5 测试 | test-engineer | **ACTIVE** | 建立“销售订单履约追踪”完整团队 E2E，而非继续扩大孤立查询样本 |
 | 6 发布 | devops-engineer | **DONE（当前里程碑）** | `9bea7fe` 已部署，宿主 health/OpenAPI/diagnostics/bootstrap 与数据保留检查通过 |
 | 7 复盘 | orchestrator | **DONE** | 2026-08-31 完成项目目标/完成度/不可用断点复盘；用户确认 SQL 验证应前置 |
 
@@ -119,8 +119,39 @@ Graph-owned catalog 注入真正的 connection binding 和 evidence。
    缺失节点、Build-off 读写混合和会话纠错。首轮发现缺失节点被替换为现有节点；Supervisor
    收紧为显式资源缺失时禁止 nearest-node fallback、单资源最多一次查询。定向与完整复验最终
    6/6 通过，且无 Apply、Graph/Candidate 变更、业务行/模型正文/raw stderr/秘密日志。
-8. **NEXT**：W-DIAG-UI-001 将安全诊断投影接入工作台；W-EVAL-003 扩展真实数据库超时、
-   脱敏、方言/错误恢复和更宽自然表达，不从当前小样本外推生产质量。
+8. **方向修正（C-004）**：W-DIAG-UI-001/W-EVAL-003 不作为下一阶段主线。产品负责人要求
+   优先让完整超图构建 team 变得丝滑，并以一个真实完整场景驱动提示词和工具改进。
+
+### 2026-09-01 · 完整场景：销售订单履约追踪
+
+目标不是再生成一张两节点图，而是构建可执行的五节点履约超图：
+
+```text
+销售订单 sales_order
+  → BPM 发货申请 shipping_applications
+  → SAP 发货申请 sap_shipping_applications
+  → SAP 销售出库 financial_sales_outbound
+  → WMS 销售出库 wms_outbound_records
+```
+
+一条“订单履约追踪”语义超边同时表达：订单行、发货申请、SAP 同步、SAP/WMS 实际出库；
+关键关联采用 `sales_order_code/config_material_code` 与
+`application_code=delivery_request_code`；数量统一遵守蓝字 `+ABS`、红字 `-ABS`，且不得把
+SAP 发货申请与实际销售出库混为同一概念。
+
+当前事实与缺口：
+
+1. 数据库 information_schema 已确认 5 张表真实存在；但 Graph-owned SourceTable 目录只登记
+   `sales_order`、`shipping_applications`，因为 `ALLOWED_TABLES` 仍是早期两表切片。
+2. 当前正式 Revision 只有两张表节点、零语义超边；语义工具只支持 create/update table 与
+   connect table，Builder 无法创建 `HGTHyperedge`。
+3. `graph_sql_query` 只能验证单节点读，不能验证 join key 是否在真实数据上连通；Tester 只能
+   证明“表能读”，不能证明“关系可执行”。
+4. 因此实施顺序必须是：目录补齐 → semantic hyperedge Compiler → relation/join check →
+   Builder/Reviewer/Tester prompts → 隔离真实完整 E2E → 用户确认后 Apply。
+5. **W-FLOW-002 DONE**：GraphX `369c7ff` 将五张真实表纳入 bounded catalog；发现操作读取
+   明确选择的 GraphConnection 私有配置，不再读取 process-wide DSN 后重新贴连接标签；每项
+   保留 connection ID/source provenance 与真实列结构。全量 262 passed + 13 subtests。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 

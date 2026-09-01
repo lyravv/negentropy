@@ -2,8 +2,8 @@
 title: 未决问题与变更请求
 role: orchestrator(维护) / 全员(提出)
 status: DRAFT
-version: 0.5
-updated: 2026-08-31
+version: 0.6
+updated: 2026-09-01
 upstream: []
 downstream: [全员]
 ---
@@ -29,3 +29,4 @@ downstream: [全员]
 | C-001 | product-manager(另一 agent 提出) | spec/01,05,07 + decisions | product-owner（user） | 可验证的自定义模型供应商：DeepSeek 保持默认，允许运营者显式选择经无业务数据探测通过的内网 OpenAI-compatible qwen3.6-27b 备选（US-001，9 条 AC）。与 Phase 1 窄冲突（model routing 原为非范围）。 | 产品负责人 2026-08-21 决定砍掉；DeepSeek 维持唯一绑定。 | REJECTED | US-001 已删除；如未来重启需重新立项。 |
 | C-002 | orchestrator（基于用户复盘） | spec/01,02,03,06,11,12 + GX-APP-025/030/036 | product-owner（user） | 将“数据源显式绑定 + 受控 SQL 查询验证”提升为当前可用性里程碑的基础门禁；一个 `table` 节点不能只结构合法，必须绑定同 Graph 已连接数据源并能经服务端限权查询验证。 | 与原 Phase 1 “数据库 connector 非范围”存在冲突；需修正 GraphX 产品范围/交接文档，并将 SQL backend 从 Supervisor 局部装配提升为角色最小权限共享基础设施。 | APPROVED | 2026-08-31 用户明确：SQL 应尽早提供，否则无法验证所构建的图；当前不可用感的根本是节点未连接数据源。 |
 | C-003 | product-owner（user） | spec/03,05,06,11、semantic-change contract、ADR-009 | product-owner（user） | Agent 图变更接口从 raw HGT Patch 改为语义操作；模型不管理 Graph/Revision/Candidate/Patch/Connection/entity ID 或任何 hash，由 server-bound Resolver/Patch Compiler 注入并校验。首版只做 table create/update/connect。 | 这是 Agent 工具边界的破坏性迁移，但不改变内部 HGT Patch、Candidate、Review/Test/Apply 协议。需保留短期兼容桥，conformance 通过后从模型目录移除 raw Patch 工具。 | APPROVED | 2026-08-31 用户明确确认；GraphX `6603899` 实现，`829ddd5` 延伸到 Supervisor 协调身份；2026-09-01 真实 Builder trace 仅调用两个语义工具并生成 ready Candidate。 |
+| C-004 | product-owner（user） | GraphX 下一阶段计划、semantic-change contract、Builder/Reviewer/Tester tools/prompts | product-owner（user） | 暂缓诊断 UI 和泛化故障评测；下一阶段以一个完整业务场景优化整个超图构建团队，使其能顺畅完成资源理解、节点/关系/超边构建、数据验证、Review、Test 和用户 Apply。首个场景选“销售订单履约追踪”。 | 现有语义工具只支持 table 节点与二元关系，资源目录只登记 2/5 张所需表，无法真实验收超图团队；需扩展目录、语义超边操作、关系数据验证和团队提示词，但保持模型不接触技术 ID/hash、Apply 仍只属于用户。 | APPROVED | 2026-09-01 用户明确否定 W-DIAG-UI-001/W-EVAL-003 作为下一主线；只读 information_schema 已确认 5 张场景表均真实存在。实施由 W-FLOW-001..006 跟踪。 |
