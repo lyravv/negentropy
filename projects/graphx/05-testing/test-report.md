@@ -2,17 +2,34 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.2
+version: 1.3
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@cbcac13
+source_revision: graphx@9bea7fe
 approver: test-engineer
-approval_evidence: 259 tests + 13 subtests; live QueryReceipt; restart-durable diagnostic lookup; deployed host checks
+approval_evidence: 261 tests + 13 subtests; 6/6 real semantic query cases; live QueryReceipt/diagnostics; deployed host checks
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
 # 测试报告 — GX-APP-015/016/017/018/021..025
+
+## 2026-09-01 W-EVAL-002 · APPROVED
+
+- versioned 6-case/7-turn suite 覆盖直接、礼貌、口语查询，缺失节点，Build-off 读写混合和
+  会话纠错；隔离 metadata 副本，真实数据连接只读，不暴露/调用 Apply。
+- 首次有效运行 5/6：纠错场景第一轮把不存在的“客户退款单”替换成现有节点并查询；这是
+  真实语义错误，不以工具成功掩盖。Supervisor 随后增加 exact name/alias 缺失禁止替代及
+  单资源最多一次查询约束。
+- 定向纠错复验 1/1，完整复验最终 6/6；每个成功查询恰好 1 QueryReceipt，缺失节点 0 查询，
+  纠正后恢复，全部场景无 Graph/Candidate 变化。
+- 安全报告 Schema 验证通过，且 `model_content_logged/business_rows_logged/
+  runtime_stderr_logged/connection_secrets_logged/apply_exposed_or_called` 均为 false。
+- 宿主完整回归 `261 passed, 13 subtests passed in 32.31s`；GraphX `9bea7fe` 已部署到
+  8001（PID 3470963），health、20-path OpenAPI 与数据保留检查通过。
+
+限制：6/6 是首轮针对性样本，不代表全部业务表达或数据库故障已覆盖；W-EVAL-003 扩展
+timeout、permission、redaction、dialect、多源歧义和更宽 paraphrase。
 
 ## 2026-09-01 W-OBS-001 · APPROVED
 
