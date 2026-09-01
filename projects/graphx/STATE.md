@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.5
+version: 3.6
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,14 +23,14 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，W-FLOW-002 HEAD `369c7ff` 待部署） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `369c7ff`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
 | 测试状态 | **262 passed + 13 subtests，全量 exit 0**；GX-APP-042 五表 Graph-owned 目录已通过 conformance |
 | 真实运行证据 | 6 场景/7 轮自然语言查询评测最终 6/6 通过；缺失节点不替换、纠正后恢复、读写混合不变更 Graph/Candidate；此前 10/10 语义构图 smoke 通过 |
-| 运行应用 | `9bea7fe` 已部署到 8001，PID `3470963`，健康；20-path OpenAPI；2 Graph/1 connection/5 Candidate 均保留 |
+| 运行应用 | `369c7ff` 已部署到 8001，PID `3527817`，健康；Active Graph 五表目录已刷新；Revision 3 与 5 Candidate 未变化 |
 | 下一步 | **W-FLOW-003** 语义超边 Resolver/Compiler；随后 W-FLOW-004 关系数据验证、W-FLOW-005 团队提示词、W-FLOW-006 完整真实闭环 |
 
 ## 项目批准者
@@ -151,7 +151,8 @@ SAP 发货申请与实际销售出库混为同一概念。
    Builder/Reviewer/Tester prompts → 隔离真实完整 E2E → 用户确认后 Apply。
 5. **W-FLOW-002 DONE**：GraphX `369c7ff` 将五张真实表纳入 bounded catalog；发现操作读取
    明确选择的 GraphConnection 私有配置，不再读取 process-wide DSN 后重新贴连接标签；每项
-   保留 connection ID/source provenance 与真实列结构。全量 262 passed + 13 subtests。
+   保留 connection ID/source provenance 与真实列结构。全量 262 passed + 13 subtests；部署后
+   正式 Active Graph 目录已包含全部五表，Revision/Candidate 数量均未变化。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 
