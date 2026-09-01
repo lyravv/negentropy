@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.1
+version: 3.2
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `a14a049`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `cbcac13`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **查询 Artifact 主链已完成，进入可观测性与开放表达评测收敛**：构图和查询的模型入口均只使用语义层，持久化 ID/hash 由服务端管理 |
-| 测试状态 | **257 passed + 13 subtests，全量 exit 0**；GX-QUERY-006 以 immutable `graphx-query-receipt/v1` 持久化精确 Revision/Candidate 查询证据并绑定 Supervisor 输出 |
+| 当前阶段 | **查询 Artifact 与持久诊断闭环已完成，进入开放表达评测收敛**：构图和查询的模型入口均只使用语义层，持久化 ID/hash 由服务端管理 |
+| 测试状态 | **259 passed + 13 subtests，全量 exit 0**；GX-QUERY-006 QueryReceipt 与 GX-OBS-001 重启可检索诊断均已通过 conformance |
 | 真实运行证据 | 用户已 Apply 并成功随机查询销售订单；真实 Tester 完成 `candidate_get→graph_sql_query→test_run`，QueryReceipt 的 Candidate/Revision/节点/producer/hash 精确绑定；10/10 真实模型语义 Candidate smoke 通过 |
-| 运行应用 | `a14a049` 已部署到 8001，PID `3419561`，健康；2 Graph/1 connection/5 Candidate 均保留，Active Graph 正常 |
-| 下一步 | **W-OBS-001** 完善结构化日志/诊断检索；随后 **W-EVAL-002** 用多样化真实用户表达验证查询、澄清、失败与恢复，不自动 Apply |
+| 运行应用 | `cbcac13` 已部署到 8001，PID `3443710`，健康；20-path OpenAPI；2 Graph/1 connection/5 Candidate 均保留 |
+| 下一步 | **W-EVAL-002** 用多样化真实用户表达验证查询、澄清、失败与恢复，不自动 Apply；基于失败分类再决定提示词或工具契约改进 |
 
 ## 项目批准者
 
@@ -51,9 +51,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **ACTIVE** | GX-QUERY-006 已完成；当前主线为 W-OBS-001 可观测性 |
-| 5 测试 | test-engineer | **ACTIVE** | W-USABLE-004/005 已通过；继续扩展非固定提示词和失败路径评估 |
-| 6 发布 | devops-engineer | **DONE（当前里程碑）** | `a14a049` 已部署，宿主 health/OpenAPI/bootstrap 与数据保留检查通过 |
+| 4 实现 | frontend ∥ backend | **ACTIVE** | GX-QUERY-006/W-OBS-001 已完成；当前只针对 W-EVAL-002 暴露的问题迭代 |
+| 5 测试 | test-engineer | **ACTIVE** | W-EVAL-002：扩展非固定提示词、歧义、失败和恢复路径评估 |
+| 6 发布 | devops-engineer | **DONE（当前里程碑）** | `cbcac13` 已部署，宿主 health/OpenAPI/diagnostics/bootstrap 与数据保留检查通过 |
 | 7 复盘 | orchestrator | **DONE** | 2026-08-31 完成项目目标/完成度/不可用断点复盘；用户确认 SQL 验证应前置 |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
@@ -112,8 +112,11 @@ Graph-owned catalog 注入真正的 connection binding 和 evidence。
    `graphx-query-receipt/v1`；包含语义请求、精确 Revision/Candidate、受限脱敏结果、五项网关检查
    与 producer run。统一 Agent Task 同时持久化 QueryReceipt 和 SupervisorDecision；旧
    prose detector→QuestionRun 固定管线已从产品入口移除，不恢复关键词路由。
-6. **W-OBS-001 / W-EVAL-002 NEXT**：补可检索结构化运行日志、失败聚类和多样化真实提示词集；
-   当前 10/10 证明工具协议稳定，不等同于开放式业务表达质量已经充分覆盖。
+6. **W-OBS-001 DONE**：精确 Task 诊断和 Graph 范围 status/trace 索引从持久
+   Task/Agent/public event/Artifact 事实重建；不暴露 prompt、业务行、连接材料、raw stderr 或
+   hidden reasoning。旧空 trace 已安全回填 task ID；真实重启后两个 Graph 的近期失败均可查。
+7. **W-EVAL-002 NEXT**：建立多样化真实提示词集、语义成功/澄清/失败/恢复分类；当前
+   10/10 固定工具协议只证明协议稳定，不等同于开放式业务表达质量已经充分覆盖。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 

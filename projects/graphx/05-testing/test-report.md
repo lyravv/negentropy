@@ -2,17 +2,32 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.1
+version: 1.2
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@a14a049
+source_revision: graphx@cbcac13
 approver: test-engineer
-approval_evidence: 257 tests + 13 subtests; hash-bound live QueryReceipt; 10/10 real semantic Candidate smokes; deployed host checks
+approval_evidence: 259 tests + 13 subtests; live QueryReceipt; restart-durable diagnostic lookup; deployed host checks
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
 # 测试报告 — GX-APP-015/016/017/018/021..025
+
+## 2026-09-01 W-OBS-001 · APPROVED
+
+- 宿主完整回归：`259 passed, 13 subtests passed in 33.20s`。
+- 新增 exact Task diagnostic 与 Graph-scoped status/trace index；诊断由持久 Task、Agent、
+  allowlisted public event 和 opaque Artifact metadata 重建，不依赖当前 Chat 或活跃 Harness。
+- conformance 证明失败 root cause 在重启后仍可检索，私有异常文本不进入响应；JSON Schema、
+  OpenAPI 路径、非法状态/查询边界均由服务端约束。
+- `AgentActivity` 启动即分配服务端 trace ID；旧空 trace 幂等回填 task ID。部署后两个现有
+  Graph 分别检索到 5/3 条近期失败，全部带 trace。
+- GraphX `cbcac13` 已部署到 8001（PID 3443710）；health、20-path OpenAPI、2 Graph、
+  1 connection、5 Candidate 数据保留检查通过。
+
+限制：早期失败只持久化了 `BUILDER_FAILED/GRAPHX_SUPERVISOR_FAILED` 时，系统不会从已丢弃的
+私有 stderr 伪造 tool root cause；新运行按现有结构化 failure receipt 保留安全 cause。
 
 ## 2026-09-01 W-QUERY-006 · APPROVED
 
