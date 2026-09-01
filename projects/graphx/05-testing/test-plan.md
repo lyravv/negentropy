@@ -2,13 +2,24 @@
 title: 测试方案 — GX-APP-015/016/017/018
 role: test-engineer
 status: APPROVED
-version: 0.3
+version: 0.4
 updated: 2026-08-21
 upstream: [graphx/spec/11-workbench-application.md, graphx/spec/03-domain-invariants.md, graphx/spec/06-testing-and-handoff.md, graphx/spec/conformance/requirements.json, 04-implementation/backend-notes.md]
 downstream: [backend-engineer, orchestrator]
 ---
 
 # 测试方案 — GX-APP-015/016/017/018
+
+## W-QUERY-006 查询凭证增量门禁
+
+| 用例 | 验证 | 优先级 |
+|---|---|---|
+| TC-012 | QueryReceipt JSON Schema、确定性 hash 与篡改拒绝 | P0 |
+| TC-013 | 同一 Agent Task 持久化 QueryReceipt + SupervisorDecision，精确绑定 Revision 且不写 QuestionRun | P0 |
+| TC-014 | Harness 私有状态保存完整凭证，公开回执只暴露 artifact ID/hash | P0 |
+| TC-015 | 真实 Candidate Preview 查询凭证精确绑定且 Candidate 保持未 Apply | P0 |
+
+通过标准：P0 100%；全量回归通过；真实 smoke 不输出业务行、连接秘密、模型正文或原始 stderr。
 
 ## 交接说明
 - **给谁**：backend-engineer / orchestrator

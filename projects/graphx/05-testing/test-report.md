@@ -2,17 +2,34 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.0
+version: 1.1
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@5d6afe4
+source_revision: graphx@a14a049
 approver: test-engineer
-approval_evidence: 255 tests + 13 subtests; real unapplied Candidate Preview query; 10/10 real semantic Candidate smokes; deployed host checks
+approval_evidence: 257 tests + 13 subtests; hash-bound live QueryReceipt; 10/10 real semantic Candidate smokes; deployed host checks
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
 # 测试报告 — GX-APP-015/016/017/018/021..025
+
+## 2026-09-01 W-QUERY-006 · APPROVED
+
+- 宿主完整回归：`257 passed, 13 subtests passed in 35.67s`；QueryReceipt/Harness 定向复验
+  `16 passed`。
+- `graph_sql_query` 成功后自动生成 immutable `graphx-query-receipt/v1`，服务端验证精确
+  Graph/Revision、可选 Candidate ID/hash、语义节点、producer run、受限脱敏结果和五项网关检查。
+- 统一 Agent Task 同时持久化 typed QueryReceipt 与 SupervisorDecision；公开工具回执只含
+  opaque artifact ID/hash，不暴露业务行、连接配置或秘密。
+- 真实隔离 Candidate Preview 查询通过：`candidate_get → graph_sql_query → test_run`；
+  QueryReceipt 与 Candidate/Revision/语义节点/producer/public hash 全部精确一致，Candidate
+  保持 `proposed`，未 Apply。
+- GraphX `a14a049` 已部署到 8001（PID 3419561）；health、18-path OpenAPI、Bootstrap
+  数据保留检查通过（2 Graph、1 connection、5 Candidate、Active Graph 正常）。
+
+残余范围：本轮证明 typed 查询证据和真实受控查询链路，不代表开放式用户表达、歧义澄清和
+失败恢复质量已充分覆盖；由 W-EVAL-002 验证。日志跨重启检索和失败聚类由 W-OBS-001 收敛。
 
 ## 2026-09-01 W-USABLE-004/005 · APPROVED
 
