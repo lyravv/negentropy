@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.8
+version: 2.9
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署功能提交 `856755d`；诊断脚本 HEAD `21a7be5`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `2ba3d15`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **受控 Candidate Preview 查询边界已交付，进入重复可用性评估**：产品角色 typed-tool-only，Tester 不再有 Bash/本地文件旁路 |
-| 测试状态 | 本轮核心/规范专项 39 passed；完整套件在正确宿主线程环境中 244 passed、8 个已移除旧 `/build` API 测试失败（历史测试债务，不恢复旧管线） |
+| 测试状态 | **252 passed + 13 subtests，全量 exit 0**；旧 `/build` 的 8 个测试已迁移到统一 Chat/mention/Build capability，TestClient 假挂已证实为受限沙箱线程机制而非应用死锁 |
 | 真实运行证据 | 用户已 Apply 并成功随机查询销售订单；合成真实 Harness context/Candidate smoke 均完成，Builder 只调用 `graph_semantic_context_get`→`graph_propose_changes`，未访问数据库 |
-| 运行应用 | GraphX 功能提交 `856755d` 已部署到 8001，PID `2761723`，健康；现有 Graph/Chat/DB 保留；`21a7be5` 仅更新 smoke 脚本无需重启 |
-| 下一步 | W-USABLE-004：补真实 Candidate Preview `graph_sql_query`（不 Apply）门禁；迁移 8 个旧 `/build` 测试；随后 W-USABLE-005 做不自动 Apply 的 10 轮语义构图/查询评估 |
+| 运行应用 | `2ba3d15` 已部署到 8001，PID `2811818`，健康；统一消息路由存在，旧 Build 路由不存在；现有 Graph/Chat/DB 保留 |
+| 下一步 | W-USABLE-004a：补真实 Candidate Preview `graph_sql_query`（不 Apply）门禁；随后 W-USABLE-005 做不自动 Apply 的 10 轮语义构图/查询评估；GX-QUERY-006 另以 tool-first artifact 流重建 |
 
 ## 项目批准者
 
@@ -100,11 +100,14 @@ Graph-owned catalog 注入真正的 connection binding 和 evidence。
 
 1. **W-USABLE-004a**：在隔离测试 Graph/临时元数据上执行真实 Candidate Preview
    `graph_sql_query`，证明 Tester 不 Apply 也能读到 Preview 绑定的数据；不得读取连接文件。
-2. **W-TEST-DEBT-001**：把 8 个仍请求已删除 `/api/v1/alpha/graphs/{id}/build` 的测试迁移
-   到统一 Chat message + structured mention/Build capability；禁止为了测试绿恢复旧固定管线。
+2. **W-TEST-DEBT-001 DONE**：8 个旧入口测试已迁移到统一 Chat message + structured
+   mention/Build capability；删除死 Alpha `BuildRequest`，完整回归 252 passed + 13 subtests。
+   迁移还修复了独立角色同步失败响应缺少净化 `terminal_code`（GX-APP-040）。
 3. **W-USABLE-005**：连续 10 轮运行“语义 Context→proposal→Candidate/diagnostic”评估，
    统计一次成功率、工具调用次数、schema/clarification/error code；未经用户逐次确认不自动 Apply。
 4. 根据失败分布再优化 prompt/schema/tool receipt；在已有证据前不新增 Agent 角色、节点类型或 UI。
+5. **GX-QUERY-006 已重新打开**：旧 prose detector→QuestionRun 固定管线不符合统一入口；
+   未来由 typed query receipt + typed Tester artifact 实现，不恢复关键词路由。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 
