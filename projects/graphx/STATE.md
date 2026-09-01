@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.6
+version: 3.7
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `15878ba`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `bd2c53f`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
-| 测试状态 | W-FLOW-005 相关 73 项定向测试 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；大范围回归仍在既有 HTTP/Chat 路径等待，未伪称新全量通过 |
-| 真实运行证据 | 完整隔离 team 一次用户目标产出 5 node + 4 edge + 1 hyperedge；Reviewer passed；Tester 四条 join 均 20/capped 且 TestReport passed；Candidate 未 Apply |
-| 运行应用 | `15878ba` 已部署到 8001，PID `3870656`，健康；正式 Active Graph 未 Apply |
-| 下一步 | **W-FLOW-006** 在正式 Chat 运行完整团队并停在用户 Apply 审批；用户确认后 Apply、重启与查询验证 |
+| 测试状态 | W-FLOW-006 guard 修复相关 31 项通过；W-FLOW-005 相关 73 项 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
+| 真实运行证据 | 正式 Chat 一次目标完成 GraphX→Builder→Reviewer→Tester→GraphX：5 node + 4 edge + 1 hyperedge；Review/Test passed；四条 join 均 20/capped；Candidate ready、Revision 仍为 3 |
+| 运行应用 | `bd2c53f` 已部署到 8001，PID `3889276`，健康；正式 Candidate 待用户 Apply |
+| 下一步 | **等待用户确认 Apply** `candidate:agent-task-75bfc1872f41407eb273c5ca28632f8a`；确认后验证 Revision 4、重启持久性与随机订单查询 |
 
 ## 项目批准者
 
@@ -168,6 +168,14 @@ SAP 发货申请与实际销售出库混为同一概念。
    两个旧节点、纠正反向旧边并只创建三项缺失资源；Reviewer/Tester 共享相同五表/四关系/超边/规则验收。
    真实隔离 team runner 一次用户目标生成 10-operation Candidate，最终 5 节点、4 关系、1 五成员超边；
    Reviewer passed，Tester 四个 relation receipt 均 20/capped 且 TestReport passed，未 Apply。
+9. **W-FLOW-006 正式团队链已通过，等待用户 Apply**：正式 Chat
+   `thread-1960563b5c264656bda7be3ac593e4ff` 从一次 `@GraphX` 目标动态完成
+   GraphX→Builder→Reviewer→Tester→GraphX。Candidate
+   `candidate:agent-task-75bfc1872f41407eb273c5ca28632f8a` 的 Preview 为 5 节点、4 关系、1 超边；
+   Reviewer passed；Tester 四条 bounded join 均为 20/capped，权威 TestReport 已持久化并 passed；
+   Candidate 状态 ready，正式 Revision 保持 3。运行中发现并修复两个控制面缺陷：`3d39eeb` 保证每个
+   Supervisor run 只有一个权威决策；`bd2c53f` 将 Candidate no-change guard 收紧到同一 root task
+   lineage，避免历史等价 Candidate 阻断新目标。当前仅等待 product-owner 的逐次 Apply 授权。
 
 Remove、API/document 和 proposal-local alias 仍不进入当前语义契约，后续按真实需求扩展 schema。
 

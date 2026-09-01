@@ -2,15 +2,29 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.3
+version: 1.4
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@15878ba
+source_revision: graphx@bd2c53f
 approver: test-engineer
-approval_evidence: W-FLOW-005 focused 73 tests + 13 subtests; real isolated complete Builder/Reviewer/Tester team; deployed host checks
+approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-01 W-FLOW-006 · TEAM E2E APPROVED / APPLY PENDING
+
+- GraphX `3d39eeb` 约束每个 Supervisor run 只接受一个权威 decision；`bd2c53f` 将无变化保护限定为
+  同一 root task lineage 的连续 Builder Artifact hash，历史等价 Candidate 不再阻断新用户目标。
+- 两项修复均已推送，`bd2c53f` 部署到 8001（PID 3889276）；相关动态任务图、Supervisor、规范、
+  Compiler/Harness 共 31 项测试通过。
+- 正式 Chat `thread-1960563b5c264656bda7be3ac593e4ff` 由一次用户目标动态完成
+  GraphX→Builder→Reviewer→Tester→GraphX；未使用固定流水线，未自动 Apply。
+- Candidate `candidate:agent-task-75bfc1872f41407eb273c5ca28632f8a` 为 ready：Preview 为
+  5 node + 4 relation + 1 hyperedge；Reviewer passed；Tester 四条 Candidate-bound relation receipt
+  均为 20/capped，权威 TestReport 已持久化且 passed。
+- 正式 Graph Revision 仍为 3。E2E 团队链验收通过；W-FLOW-006 仅剩用户逐次确认 Apply、重启持久性
+  与随机订单查询验证，因此不得标记完整发布 DONE。
 
 ## 2026-09-01 W-FLOW-005 · APPROVED
 
