@@ -2,7 +2,7 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.4
+version: 1.5
 updated: 2026-09-01
 artifact_type: test-report
 source_revision: graphx@bd2c53f
@@ -25,6 +25,16 @@ downstream: [backend-engineer, orchestrator, devops-engineer]
   均为 20/capped，权威 TestReport 已持久化且 passed。
 - 正式 Graph Revision 仍为 3。E2E 团队链验收通过；W-FLOW-006 仅剩用户逐次确认 Apply、重启持久性
   与随机订单查询验证，因此不得标记完整发布 DONE。
+
+### Apply 后补充验收 · APPROVED
+
+- Product owner 已显式 Apply；Candidate 状态 `applied`，正式 Graph 从 Revision 3 升为 Revision 4
+  (`revision-a16a8569e53943ecb291ea1704dd268b`)。
+- GraphX 重启到 PID 3917230 后，Bootstrap 仍为 Revision 4，结构仍精确为 5 node + 4 edge +
+  1 hyperedge，证明正式图持久化成功。
+- Apply 后只读 Chat 任务 `agent-task-0c5ff470895b4dd1a010558dcf0f238c` 通过
+  `graph_sql_query` 在语义节点 `sales-order` 返回 1 条有界结果；QueryReceipt 绑定精确 Revision 4、
+  candidate_id 为空，并完整通过五项 Gateway 检查。W-FLOW-006 发布闭环 APPROVED。
 
 ## 2026-09-01 W-FLOW-005 · APPROVED
 

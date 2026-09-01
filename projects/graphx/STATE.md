@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.7
+version: 3.8
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -27,11 +27,11 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
+| 当前阶段 | **首个完整超图场景已闭环**：销售订单履约追踪已完成资源、构图、关系验证、Review/Test、用户 Apply、重启与查询验收 |
 | 测试状态 | W-FLOW-006 guard 修复相关 31 项通过；W-FLOW-005 相关 73 项 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
-| 真实运行证据 | 正式 Chat 一次目标完成 GraphX→Builder→Reviewer→Tester→GraphX：5 node + 4 edge + 1 hyperedge；Review/Test passed；四条 join 均 20/capped；Candidate ready、Revision 仍为 3 |
-| 运行应用 | `bd2c53f` 已部署到 8001，PID `3889276`，健康；正式 Candidate 待用户 Apply |
-| 下一步 | **等待用户确认 Apply** `candidate:agent-task-75bfc1872f41407eb273c5ca28632f8a`；确认后验证 Revision 4、重启持久性与随机订单查询 |
+| 真实运行证据 | 正式 Chat 一次目标完成完整团队链；Candidate 已由用户 Apply 为 Revision 4；重启后保持 5 node + 4 edge + 1 hyperedge；`sales-order` 语义节点只读查询成功 |
+| 运行应用 | `bd2c53f` 已部署到 8001，重启后 PID `3917230`，健康；正式 Active Graph 为 Revision 4 |
+| 下一步 | 无用户阻塞项；下一开发切片优先收敛角色运行时工具面/公开回复、统一 source_ref namespace，再选择第二个完整业务场景 |
 
 ## 项目批准者
 
@@ -176,6 +176,10 @@ SAP 发货申请与实际销售出库混为同一概念。
    Candidate 状态 ready，正式 Revision 保持 3。运行中发现并修复两个控制面缺陷：`3d39eeb` 保证每个
    Supervisor run 只有一个权威决策；`bd2c53f` 将 Candidate no-change guard 收紧到同一 root task
    lineage，避免历史等价 Candidate 阻断新目标。当前仅等待 product-owner 的逐次 Apply 授权。
+10. **W-FLOW-006 DONE**：product-owner 已确认 Apply，Candidate 状态为 `applied`，正式 Graph 升为
+    Revision 4（`revision-a16a8569e53943ecb291ea1704dd268b`）。服务重启到 PID 3917230 后仍保持
+    5 节点、4 关系、1 超边；Apply 后只读验收任务通过语义节点 `sales-order` 在精确 Revision 4 上
+    返回 1 条有界结果，五项 Query Gateway 检查完整，未绑定 Candidate、未回退默认连接。
 
 Remove、API/document 和 proposal-local alias 仍不进入当前语义契约，后续按真实需求扩展 schema。
 
