@@ -5,12 +5,25 @@ status: APPROVED
 version: 1.3
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@4415c30
+source_revision: graphx@5791c04
 approver: test-engineer
-approval_evidence: W-FLOW-003 focused 41 tests; real isolated five-table semantic Candidate smoke; deployed host checks; earlier 6/6 query evaluation
+approval_evidence: W-FLOW-004 focused 63 tests + 13 subtests; real isolated Candidate relation check; deployed host checks; earlier Builder/query evidence
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-01 W-FLOW-004 · APPROVED
+
+- GraphX commit：`5791c04 feat: validate candidate relations safely`，已推送并部署（PID 3847889）。
+- `graph_relation_check` 仅接受两个语义节点名、1–4 个字段对和上限 20；服务端绑定精确
+  Revision/Candidate hash、解析字段和同库连接、执行 read-only timeout join，仅返回聚合计数。
+- `graphx-relation-check-receipt/v1`、ADR-013、GX-QUERY-007、role-tools、Harness 协议、Tester prompt
+  与持久 TypedAgentArtifact 输出已同步；跨连接关系明确 fail closed。
+- 63 项定向/规范/角色/桥接/运行时测试及 13 个 subtests 通过。
+- 真实隔离 Harness `relation-20260901-v2` 仅调用 `candidate_get → graph_relation_check → test_run`；
+  `sales-order.sales_order_code = shipment-application.sales_order_code` 返回 `20/capped=true`，六项网关
+  检查与静态 TestReport 通过；Candidate 保持 proposed/unapplied，未输出业务行、SQL 或连接秘密。
+- 大范围 pytest 仍会在既有 HTTP/Chat 路径长时间等待且无本切片失败栈；已中止并保持如实记录。
 
 ## 2026-09-01 W-FLOW-003 · APPROVED
 

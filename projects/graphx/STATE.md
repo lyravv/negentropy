@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `4415c30`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `5791c04`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
-| 测试状态 | W-FLOW-003 相关 41 项定向/规范测试通过；此前基线 **262 passed + 13 subtests**；本轮全量在既有 non-build Chat 用例等待，未伪称新全量通过 |
-| 真实运行证据 | 真实隔离 Builder 一次语义提案成功生成 5 node + 4 edge + 1 五成员 hyperedge Candidate；未访问 DB/私有文档、未 Apply；查询评测此前 6/6 |
-| 运行应用 | `4415c30` 已部署到 8001，PID `3589737`，健康；正式 Active Graph 未 Apply |
-| 下一步 | **W-FLOW-004** 关系数据验证与 Tester 证据；随后 W-FLOW-005 团队提示词、W-FLOW-006 完整真实闭环 |
+| 测试状态 | W-FLOW-004 相关 63 项定向测试 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；大范围回归仍在既有 HTTP/Chat 路径等待，未伪称新全量通过 |
+| 真实运行证据 | 隔离 Builder 已生成 5 node + 4 edge + 1 hyperedge；隔离 Tester 已对 Candidate Preview 执行 aggregate-only sales_order_code join-check（20/capped）并通过 test_run；均未 Apply |
+| 运行应用 | `5791c04` 已部署到 8001，PID `3847889`，健康；正式 Active Graph 未 Apply |
+| 下一步 | **W-FLOW-005** 构建团队 prompts/Context/协作收敛；随后 W-FLOW-006 完整真实闭环 |
 
 ## 项目批准者
 
@@ -158,6 +158,11 @@ SAP 发货申请与实际销售出库混为同一概念。
    evidence/hash/precondition 与同提案依赖。真实隔离 Builder 用一次 `graph_propose_changes` 生成五节点、
    四关系和“订单履约追踪”五成员超边 Candidate，未访问数据库/私有文档且未 Apply。41 项定向/规范测试通过；
    全量 suite 另在既有 `test_non_business_question_uses_agent` 处等待，无本切片失败栈，需独立定位。
+7. **W-FLOW-004 DONE**：GraphX `5791c04` 增加 `graph_relation_check` 和
+   `graphx-relation-check-receipt/v1`。模型只提交两个语义节点名和 1–4 个字段对；服务端在精确
+   Revision/Candidate Preview 上解析节点/字段/连接并执行同库只读 bounded join，公开结果只有
+   `match_count/capped`。真实隔离 Tester 对 `sales-order → shipment-application` 的
+   `sales_order_code` 得到 20/capped，六项确定性网关检查及 test_run 均通过，Candidate 未 Apply。
 
 Remove、API/document 和 proposal-local alias 仍不进入当前语义契约，后续按真实需求扩展 schema。
 
