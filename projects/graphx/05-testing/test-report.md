@@ -2,17 +2,34 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 0.9
-updated: 2026-08-28
+version: 1.0
+updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@280d0ef
+source_revision: graphx@5d6afe4
 approver: test-engineer
-approval_evidence: 58 core/runtime/conformance tests + 8 Candidate-card tests passed; frontend production build and local pi-ai SDK/plugin smoke passed
+approval_evidence: 255 tests + 13 subtests; real unapplied Candidate Preview query; 10/10 real semantic Candidate smokes; deployed host checks
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
 # 测试报告 — GX-APP-015/016/017/018/021..025
+
+## 2026-09-01 W-USABLE-004/005 · APPROVED
+
+- 宿主完整回归：`255 passed, 13 subtests passed in 32.09s`。
+- 真实 Candidate Preview：Tester 仅通过 typed catalog 调用
+  `candidate_get → graph_sql_query → test_run`；exact Candidate ID/hash 与 connector scope
+  均由服务端绑定；确定性 suite passed，隔离 Candidate 保持 `proposed`，未 Apply。
+- GX-APP-041：模型查询参数仅含语义 `node_name`；持久化 node ID 不在工具 schema，服务端
+  对缺失/重名 fail closed。定向契约 3 passed。
+- 稳定性：10/10 独立真实模型会话成功，每轮工具序列均为
+  `graph_semantic_context_get → graph_propose_changes`；未加载业务源、未访问数据库、未 Apply。
+- 安全日志：上述 live smoke 均未输出模型正文、runtime stderr、连接秘密或业务行。
+- 发布：GraphX `5d6afe4` 已部署到 8001（PID 2848959）；health、18-path OpenAPI、统一消息
+  入口和 Bootstrap 数据保留检查通过，legacy `/build` 不存在。
+
+残余范围：10/10 属于固定工具协议稳定性，不代表开放式用户表达质量已充分覆盖；下一轮由
+W-QUERY-006/W-EVAL-002 建立 tool-first 正式 Revision 查询 Artifact 与多样化评估集。
 
 ## 2026-08-28 W-LOCAL-001 / W-CAND-001 验收
 

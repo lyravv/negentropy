@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.9
+version: 3.0
 updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `2ba3d15`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `5d6afe4`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **受控 Candidate Preview 查询边界已交付，进入重复可用性评估**：产品角色 typed-tool-only，Tester 不再有 Bash/本地文件旁路 |
-| 测试状态 | **252 passed + 13 subtests，全量 exit 0**；旧 `/build` 的 8 个测试已迁移到统一 Chat/mention/Build capability，TestClient 假挂已证实为受限沙箱线程机制而非应用死锁 |
-| 真实运行证据 | 用户已 Apply 并成功随机查询销售订单；合成真实 Harness context/Candidate smoke 均完成，Builder 只调用 `graph_semantic_context_get`→`graph_propose_changes`，未访问数据库 |
-| 运行应用 | `2ba3d15` 已部署到 8001，PID `2811818`，健康；统一消息路由存在，旧 Build 路由不存在；现有 Graph/Chat/DB 保留 |
-| 下一步 | W-USABLE-004a：补真实 Candidate Preview `graph_sql_query`（不 Apply）门禁；随后 W-USABLE-005 做不自动 Apply 的 10 轮语义构图/查询评估；GX-QUERY-006 另以 tool-first artifact 流重建 |
+| 当前阶段 | **首个可用性闭环验收完成，进入查询产品化与可观测性收敛**：构图和查询的模型入口均只使用语义层，持久化 ID 由服务端管理 |
+| 测试状态 | **255 passed + 13 subtests，全量 exit 0**；宿主回归 32.09 秒；GX-APP-041 保证 `graph_sql_query` 只暴露语义节点名称并对缺失/歧义 fail closed |
+| 真实运行证据 | 用户已 Apply 并成功随机查询销售订单；真实 Tester 在隔离的未 Apply Candidate Preview 上完成 `candidate_get→graph_sql_query→test_run`；10/10 真实模型语义 Candidate smoke 通过 |
+| 运行应用 | `5d6afe4` 已部署到 8001，PID `2848959`，健康；统一消息路由存在，旧 Build 路由不存在；2 Graph/1 connection/5 Candidate/revision 3 均保留 |
+| 下一步 | GX-QUERY-006：把正式 Revision 业务查询重建为 typed query receipt + typed Tester artifact；W-OBS-001 完善结构化日志/检索；W-EVAL-002 用多样化真实用户表达扩展评估，不自动 Apply |
 
 ## 项目批准者
 
@@ -51,9 +51,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **重新打开** | 优先修复真实 Builder 工具契约和数据源/查询闭环；现有未提交绑定修改受保护 |
-| 5 测试 | test-engineer | **重新打开** | 组件测试不再替代真实 E2E；建立可重复的数据源→Query→Apply smoke |
-| 6 发布 | devops-engineer | **BLOCKED** | 在 W-USABLE-001..004 通过前不发布；发布后必须用真实数据连接复验 |
+| 4 实现 | frontend ∥ backend | **ACTIVE** | 当前主线转为 GX-QUERY-006 tool-first 查询 Artifact 与 W-OBS-001 可观测性 |
+| 5 测试 | test-engineer | **ACTIVE** | W-USABLE-004/005 已通过；继续扩展非固定提示词和失败路径评估 |
+| 6 发布 | devops-engineer | **DONE（当前里程碑）** | `5d6afe4` 已部署，宿主 health/OpenAPI/bootstrap 与数据保留检查通过 |
 | 7 复盘 | orchestrator | **DONE** | 2026-08-31 完成项目目标/完成度/不可用断点复盘；用户确认 SQL 验证应前置 |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
@@ -91,23 +91,27 @@ Graph-owned catalog 注入真正的 connection binding 和 evidence。
 2. **W-SEM-004 DONE**：脱敏 root-cause 链已持久化；真实 update Candidate 在两次工具
    调用内成功。真实运行又发现 Supervisor 会复制坏 artifact hash，已由 `829ddd5`
    改为服务端绑定协调身份，第二轮 Reviewer→Tester→GraphX finish 完整通过。
-3. **W-USABLE-004 安全边界已封闭**：ADR-010/PD-042 取代“保留 Bash”的旧决定；产品
+3. **W-USABLE-004 DONE**：ADR-010/PD-042 取代“保留 Bash”的旧决定；产品
    Cordis composition 移除 Bash/subprocess/local-file，RoleProfile `native_tools=()`；Tester
    获得 exact Candidate ID/hash 的受控 SQL binding，服务端重算 artifact hash、应用 persisted
-   Patch 得到 Preview 并复验 connector scope。真实合成语义工具 smoke 已通过。
+   Patch 得到 Preview 并复验 connector scope。真实 Tester 已在隔离元数据、未 Apply Candidate
+   Preview 上完成受控 count 查询与 `test_run`，全程无业务行/连接秘密输出。
 
 ### 2026-09-01 · 当前执行切片
 
-1. **W-USABLE-004a**：在隔离测试 Graph/临时元数据上执行真实 Candidate Preview
-   `graph_sql_query`，证明 Tester 不 Apply 也能读到 Preview 绑定的数据；不得读取连接文件。
+1. **W-USABLE-004a DONE**：真实 Candidate Preview `graph_sql_query` 使用 exact hash binding，
+   工具序列 `candidate_get→graph_sql_query→test_run`，Candidate 最终仍为 `proposed`。
 2. **W-TEST-DEBT-001 DONE**：8 个旧入口测试已迁移到统一 Chat message + structured
    mention/Build capability；删除死 Alpha `BuildRequest`，完整回归 252 passed + 13 subtests。
    迁移还修复了独立角色同步失败响应缺少净化 `terminal_code`（GX-APP-040）。
-3. **W-USABLE-005**：连续 10 轮运行“语义 Context→proposal→Candidate/diagnostic”评估，
-   统计一次成功率、工具调用次数、schema/clarification/error code；未经用户逐次确认不自动 Apply。
-4. 根据失败分布再优化 prompt/schema/tool receipt；在已有证据前不新增 Agent 角色、节点类型或 UI。
-5. **GX-QUERY-006 已重新打开**：旧 prose detector→QuestionRun 固定管线不符合统一入口；
-   未来由 typed query receipt + typed Tester artifact 实现，不恢复关键词路由。
+3. **W-USABLE-005 DONE**：10/10 真实模型轮次均只调用
+   `graph_semantic_context_get→graph_propose_changes`，精确响应成功；无业务源、数据库或 Apply。
+4. **GX-APP-041 DONE**：`graph_sql_query` 的模型参数由 `node_id` 改为 `node_name`；服务端在
+   exact Revision/Preview 内按名称/声明 alias 唯一解析，缺失或重名时 fail closed。
+5. **GX-QUERY-006 NEXT**：旧 prose detector→QuestionRun 固定管线不符合统一入口；以 typed
+   query receipt + typed Tester artifact 实现，不恢复关键词路由。
+6. **W-OBS-001 / W-EVAL-002 NEXT**：补可检索结构化运行日志、失败聚类和多样化真实提示词集；
+   当前 10/10 证明工具协议稳定，不等同于开放式业务表达质量已经充分覆盖。
 
 Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
 
