@@ -2,8 +2,8 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 2.5
-updated: 2026-08-31
+version: 2.7
+updated: 2026-09-01
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `d46a33e`，比 origin 领先 1 commit） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `829ddd5`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **可用性收敛（阶段 0 重置）**：内核/控制面大量能力已实现，但真实“连接数据源→构建节点→受控查询验证→Review/Test→Apply”主旅程未稳定 |
-| 测试状态 | conformance 清单 79 implemented / 15 planned；2026-08-31 核心组合回归前 39 项快速通过后长时间无进展并中止，不声明全量通过 |
-| 真实运行证据 | 当前库中 Builder 近期 9 次尝试约 3 次产生 Candidate、6 次失败；最新两次失败均未产生 Candidate，核心为工具 Schema/实体 hash/错误详情/SQL binding 契约缺口 |
-| 运行应用 | `50119b2` 已于 2026-08-31 19:06 重新部署到 8001；`/health` 返回 `ok/graphx-alpha`，user service active，现有 Graph/Chat/DB 保留；历史单连接资源目录在 Builder 上下文中解析为明确 connection_id |
-| 下一步 | W-USABLE-002 正在收口：实体 hash→完整工具 Schema→脱敏字段错误→工具预算/重试门禁；团队并行准备 W-USABLE-003 的按节点多数据源绑定、歧义澄清与 Candidate/Revision SQL 验证 |
+| 当前阶段 | **语义构图边界已交付，回到可用性 E2E**：Semantic Change→Resolver→Patch Compiler→Candidate 已真实跑通 |
+| 测试状态 | 语义/网关/诊断/协调专项 51 passed + 13 subtests；非 HTTP 核心回归 149 项通过后停在既有 HTTP TestClient 挂起点；前端 build 通过 |
+| 真实运行证据 | `agent-task-1d3404eb7a754a78804ead1694d7a285` 仅调用 `graph_semantic_context_get`→`graph_propose_changes`，生成两个节点资源重绑 Candidate；Reviewer、Tester、GraphX finish 全部完成 |
+| 运行应用 | `829ddd5` 已部署到 8001，健康；现有 Graph/Chat/DB 保留；真实 Candidate 为 ready，未代替用户 Apply |
+| 下一步 | W-USABLE-004：禁止 Tester 通过 native Bash/连接文件绕开受控查询，修复 HTTP TestClient 挂起，再做 Candidate 查询→用户 Apply→Revision 查询→重启固定 E2E |
 
 ## 项目批准者
 
@@ -61,7 +61,42 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 
 ## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
 
-### 2026-08-31 · 可用性收敛里程碑（当前最高优先级）
+### 2026-09-01 · 语义构图边界重构（已交付）
+
+产品负责人已确认：**模型只看语义层；所有技术 ID、hash、Revision/连接绑定和
+并发前提由工具与 Patch Compiler 管理。** HGT Patch 继续作为系统内部正式协议，
+但不再作为 Builder 直接填写的参数。
+
+目标链路：
+
+```text
+用户业务表述
+  → Builder: create/update/connect table semantic operations
+  → server-bound Graph/Revision/resource resolver
+  → deterministic HGT Patch Compiler
+  → Candidate / Review / Test / user Apply
+```
+
+首版严格收窄到 `create_table_node`、`update_table_node`、`connect_table_nodes`。
+模型只提供节点名称、描述、语义 selector、`connection_name? / schema_name /
+table_name` 和 rationale；不得提供 graph/revision/candidate/patch/connection/entity
+ID 或 content/precondition hash。连接名称只是人类可读消歧条件，Compiler 根据
+Graph-owned catalog 注入真正的 connection binding 和 evidence。
+
+交付结果：
+
+1. **W-SEM-001..003 DONE**：ADR-009、GX-SEM-001..004/GX-APP-038、窄 DTO、
+   Resolver/Compiler 和 `graph_propose_changes` 已在 GraphX `6603899` 交付；Builder
+   模型目录只剩语义 Context 与语义变更两个工具，raw Patch 保留为系统内部协议。
+2. **W-SEM-004 DONE**：脱敏 root-cause 链已持久化；真实 update Candidate 在两次工具
+   调用内成功。真实运行又发现 Supervisor 会复制坏 artifact hash，已由 `829ddd5`
+   改为服务端绑定协调身份，第二轮 Reviewer→Tester→GraphX finish 完整通过。
+3. 回到 **W-USABLE-004**。真实 Tester 虽完成数据库验证，但使用 native Bash 读取连接
+   文件并直连数据库，而不是唯一通过 `graph_sql_query`；这是下一轮必须封闭的权限绕行。
+
+Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
+
+### 2026-08-31 · 可用性收敛里程碑
 
 产品近期唯一主旅程收缩为：
 
@@ -89,7 +124,7 @@ SourceTable/API resource 必须保留 `connection_id`。Builder 根据目录来�
 实施顺序：
 
 1. **W-USABLE-001 · 绑定不变量收口**：审查、补齐并提交当前 GX-APP-036/GX-CANVAS-002 未提交工作；统一 Bundle/Patch/应用层的连接字段契约。
-2. **W-USABLE-002 · Builder Patch 可构造性**：`graph_context_get` 返回实体 hash；`candidate_submit_patch`/`hgt_validate` 暴露完整 Schema；Bridge 返回脱敏字段级错误；禁止盲目重试耗尽额度。
+2. **W-USABLE-002 · Builder Patch 可构造性**：实体 hash、完整 Schema、脱敏字段错误和重试/预算门禁已提供，但真实运行证明 raw Patch 本身仍是错误抽象；由 W-SEM 系列取代其“模型手写 Patch”目标。
 3. **W-USABLE-003 · Graph 资源目录与 Query 验证前置**：建立 GraphConnection→SourceTable/API resource 目录归属，Builder 依目录构图并让节点保留来源绑定，目录歧义才澄清；拒绝删除仍被 Revision/Candidate 引用的连接；为 GraphX、Builder、Reviewer、Tester 按最小权限装配同一 `graph_sql_query` backend；支持 Candidate preview 和正式 Revision 绑定；保持结构化 SELECT-only、字段允许列表、超时、行/字节上限和脱敏。
 4. **W-USABLE-004 · 固定 E2E 门禁**：以销售订单+发货申请两表建立自动 smoke，验收 Candidate 查询、Review/Test、Apply、Revision 查询和重启持久性；解决 TestClient/全量测试挂起。
 5. **W-USABLE-005 · 部署与真实试用**：仅在 001–004 通过后发布；连续执行 10 次主旅程无人工修补，记录脱敏 trace 和成功率。
