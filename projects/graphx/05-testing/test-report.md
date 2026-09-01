@@ -5,12 +5,25 @@ status: APPROVED
 version: 1.3
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@9bea7fe
+source_revision: graphx@4415c30
 approver: test-engineer
-approval_evidence: 261 tests + 13 subtests; 6/6 real semantic query cases; live QueryReceipt/diagnostics; deployed host checks
+approval_evidence: W-FLOW-003 focused 41 tests; real isolated five-table semantic Candidate smoke; deployed host checks; earlier 6/6 query evaluation
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-01 W-FLOW-003 · APPROVED
+
+- GraphX commit：`4415c30 feat: compile semantic hyperedges`，已推送并部署（PID 3589737）。
+- `semantic-change/v1-draft`、Pydantic DTO、静态 JSON Schema、Builder tool catalog/prompt、ADR-012、
+  GX-SEM-005 与 manifest 已同步。
+- 41 项 semantic/compiler/bridge/executor/gateway/spec 定向测试通过；create/update 超边均验证 server-owned
+  identity、precondition、evidence 和同提案 node dependencies。
+- 真实隔离 Harness smoke `plugin-20260901-fulfillment-hyperedge` 通过：模型仅调用一次
+  `graph_semantic_context_get` 和一次 `graph_propose_changes`；Candidate 含 5 node + 4 edge + 1 hyperedge，
+  五个成员角色与三条业务规则完整；未访问数据库、未加载私有业务文档、未 Apply。
+- 全量 265 项回归在既有 `tests/conformance/test_agent_chat.py::test_non_business_question_uses_agent`
+  长时间等待且无失败栈，已中止并作为独立运行时测试问题保留；不据此伪称全量通过。
 
 # 测试报告 — GX-APP-015/016/017/018/021..025
 

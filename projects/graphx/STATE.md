@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `369c7ff`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `4415c30`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
-| 测试状态 | **262 passed + 13 subtests，全量 exit 0**；GX-APP-042 五表 Graph-owned 目录已通过 conformance |
-| 真实运行证据 | 6 场景/7 轮自然语言查询评测最终 6/6 通过；缺失节点不替换、纠正后恢复、读写混合不变更 Graph/Candidate；此前 10/10 语义构图 smoke 通过 |
-| 运行应用 | `369c7ff` 已部署到 8001，PID `3527817`，健康；Active Graph 五表目录已刷新；Revision 3 与 5 Candidate 未变化 |
-| 下一步 | **W-FLOW-003** 语义超边 Resolver/Compiler；随后 W-FLOW-004 关系数据验证、W-FLOW-005 团队提示词、W-FLOW-006 完整真实闭环 |
+| 测试状态 | W-FLOW-003 相关 41 项定向/规范测试通过；此前基线 **262 passed + 13 subtests**；本轮全量在既有 non-build Chat 用例等待，未伪称新全量通过 |
+| 真实运行证据 | 真实隔离 Builder 一次语义提案成功生成 5 node + 4 edge + 1 五成员 hyperedge Candidate；未访问 DB/私有文档、未 Apply；查询评测此前 6/6 |
+| 运行应用 | `4415c30` 已部署到 8001，PID `3589737`，健康；正式 Active Graph 未 Apply |
+| 下一步 | **W-FLOW-004** 关系数据验证与 Tester 证据；随后 W-FLOW-005 团队提示词、W-FLOW-006 完整真实闭环 |
 
 ## 项目批准者
 
@@ -153,8 +153,13 @@ SAP 发货申请与实际销售出库混为同一概念。
    明确选择的 GraphConnection 私有配置，不再读取 process-wide DSN 后重新贴连接标签；每项
    保留 connection ID/source provenance 与真实列结构。全量 262 passed + 13 subtests；部署后
    正式 Active Graph 目录已包含全部五表，Revision/Candidate 数量均未变化。
+6. **W-FLOW-003 DONE**：GraphX `4415c30` 扩展 `semantic-change/v1-draft`，Builder 可用语义
+   selector、成员业务角色和规则 create/update semantic hyperedge；Compiler 负责 member IDs、超边 ID、
+   evidence/hash/precondition 与同提案依赖。真实隔离 Builder 用一次 `graph_propose_changes` 生成五节点、
+   四关系和“订单履约追踪”五成员超边 Candidate，未访问数据库/私有文档且未 Apply。41 项定向/规范测试通过；
+   全量 suite 另在既有 `test_non_business_question_uses_agent` 处等待，无本切片失败栈，需独立定位。
 
-Remove、API/document、hyperedge 和 proposal-local alias 不进入首版，后续按真实需求扩展 schema。
+Remove、API/document 和 proposal-local alias 仍不进入当前语义契约，后续按真实需求扩展 schema。
 
 ### 2026-08-31 · 可用性收敛里程碑
 
