@@ -5,12 +5,24 @@ status: APPROVED
 version: 1.3
 updated: 2026-09-01
 artifact_type: test-report
-source_revision: graphx@5791c04
+source_revision: graphx@15878ba
 approver: test-engineer
-approval_evidence: W-FLOW-004 focused 63 tests + 13 subtests; real isolated Candidate relation check; deployed host checks; earlier Builder/query evidence
+approval_evidence: W-FLOW-005 focused 73 tests + 13 subtests; real isolated complete Builder/Reviewer/Tester team; deployed host checks
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-01 W-FLOW-005 · APPROVED
+
+- GraphX commit：`15878ba feat: guide complete fulfillment builds`，已推送并部署（PID 3870656）。
+- `graphx-semantic-scenario/v1` 在五表资源全部 server-bound 时向 Builder 暴露，在精确 Candidate Preview
+  含五表时向 Reviewer/Tester 暴露；不做关键词路由，不固定角色流水线，不含 ID/秘密/业务行。
+- `update_table_relation` 允许用语义旧端点纠正方向/端点/结构化 join；Compiler 保持 edge ID、注入
+  precondition，并解析同一提案前序节点改名，解决正式图反向旧边无法收敛的问题。
+- 73 项定向/规范/Compiler/Harness 测试及 13 subtests 通过。
+- 真实隔离 runner `fulfillment-team-20260901-v1`：一次用户目标由 Builder 生成 10-operation Candidate，
+  Preview 精确为 5 node + 4 relation + 1 hyperedge；独立 Reviewer passed；Tester 四条关系各生成
+  Candidate-bound receipt（均 20/capped），TestReport passed；Candidate 保持 unapplied，零业务行/秘密日志。
 
 ## 2026-09-01 W-FLOW-004 · APPROVED
 

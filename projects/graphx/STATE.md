@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `5791c04`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `15878ba`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **进入完整超图构建团队优化**：围绕“销售订单履约追踪”打通资源目录、节点、关系、语义超边、数据验证、Review/Test 与用户 Apply |
-| 测试状态 | W-FLOW-004 相关 63 项定向测试 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；大范围回归仍在既有 HTTP/Chat 路径等待，未伪称新全量通过 |
-| 真实运行证据 | 隔离 Builder 已生成 5 node + 4 edge + 1 hyperedge；隔离 Tester 已对 Candidate Preview 执行 aggregate-only sales_order_code join-check（20/capped）并通过 test_run；均未 Apply |
-| 运行应用 | `5791c04` 已部署到 8001，PID `3847889`，健康；正式 Active Graph 未 Apply |
-| 下一步 | **W-FLOW-005** 构建团队 prompts/Context/协作收敛；随后 W-FLOW-006 完整真实闭环 |
+| 测试状态 | W-FLOW-005 相关 73 项定向测试 + 13 subtests 通过；此前基线 **262 passed + 13 subtests**；大范围回归仍在既有 HTTP/Chat 路径等待，未伪称新全量通过 |
+| 真实运行证据 | 完整隔离 team 一次用户目标产出 5 node + 4 edge + 1 hyperedge；Reviewer passed；Tester 四条 join 均 20/capped 且 TestReport passed；Candidate 未 Apply |
+| 运行应用 | `15878ba` 已部署到 8001，PID `3870656`，健康；正式 Active Graph 未 Apply |
+| 下一步 | **W-FLOW-006** 在正式 Chat 运行完整团队并停在用户 Apply 审批；用户确认后 Apply、重启与查询验证 |
 
 ## 项目批准者
 
@@ -163,6 +163,11 @@ SAP 发货申请与实际销售出库混为同一概念。
    Revision/Candidate Preview 上解析节点/字段/连接并执行同库只读 bounded join，公开结果只有
    `match_count/capped`。真实隔离 Tester 对 `sales-order → shipment-application` 的
    `sales_order_code` 得到 20/capped，六项确定性网关检查及 test_run 均通过，Candidate 未 Apply。
+8. **W-FLOW-005 DONE**：GraphX `15878ba` 增加 checked-in
+   `graphx-semantic-scenario/v1`、资源完整性门控和 `update_table_relation`。Builder 能按资源复用/重命名
+   两个旧节点、纠正反向旧边并只创建三项缺失资源；Reviewer/Tester 共享相同五表/四关系/超边/规则验收。
+   真实隔离 team runner 一次用户目标生成 10-operation Candidate，最终 5 节点、4 关系、1 五成员超边；
+   Reviewer passed，Tester 四个 relation receipt 均 20/capped 且 TestReport passed，未 Apply。
 
 Remove、API/document 和 proposal-local alias 仍不进入当前语义契约，后续按真实需求扩展 schema。
 
