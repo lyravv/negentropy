@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 4.1
+version: 4.2
 updated: 2026-09-02
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `a1508e9`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `eac34ef`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **第二场景 Candidate 已闭环待 Apply**：跨系统出库一致性在 Revision 5 上复用四节点/三关系，仅新增独立业务超边 |
-| 测试状态 | 第二场景与语义边界相关最终定向回归 **79 passed**；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
-| 真实运行证据 | GraphX 模型侧只见语义 Graph/产物类型；最终真实团队 Reviewer passed，Tester 强制完成场景内 3/3 relation receipts，2/2 deterministic checks passed |
-| 运行应用 | `a1508e9` 已部署到 8001，PID `1134291`；正式 Active Graph 仍为 Revision 5，Agent 未 Apply |
-| 下一步 | Product owner 在工作台确认最终 `跨系统出库一致性` Candidate；Apply 后重启并执行该业务域查询验收 |
+| 当前阶段 | **第二个完整场景已闭环**：跨系统出库一致性已 Apply 为 Revision 6，并完成重启持久性与三关系只读验收 |
+| 测试状态 | 第二场景/语义边界最终 79 passed；Apply 后回执缺口修复专项扩大回归 **71 passed**；此前基线 **262 passed + 13 subtests** |
+| 真实运行证据 | Revision 6 为 5 node/4 edge/2 hyperedge；正式图三条场景关系各返回 20/capped，3 份 typed receipts 已持久化且 candidate binding 为空 |
+| 运行应用 | `eac34ef` 已部署到 8001，重启后 PID `1160919`；正式 Active Graph 为 Revision 6 |
+| 下一步 | 以第二场景的异常分类为目标补充聚合/差异查询能力，或选择第三个不同数据域验证跨数据域泛化；优先由产品目标决定 |
 
 ## 项目批准者
 

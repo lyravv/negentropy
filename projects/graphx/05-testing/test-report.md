@@ -2,17 +2,17 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.7
+version: 1.8
 updated: 2026-09-02
 artifact_type: test-report
-source_revision: graphx@a1508e9
+source_revision: graphx@eac34ef
 approver: test-engineer
 approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
 
-## 2026-09-02 W-FLOW-007 · APPROVED / APPLY PENDING
+## 2026-09-02 W-FLOW-007 · APPROVED / APPLIED
 
 - GraphX `08f7b95` 增加第二个 checked-in 场景 `跨系统出库一致性与异常定位`，按目录逐个加载
   可用场景；该场景只使用 BPM/SAP 申请、SAP 销售出库、WMS 出库四张已有资源。
@@ -24,6 +24,18 @@ downstream: [backend-engineer, orchestrator, devops-engineer]
   `add hyperedge`；Preview 为 5 node + 4 edge + 2 hyperedge，未重复资源节点或修改现有关系。
 - Reviewer passed；Tester 在服务端强制下完成场景内 3/3 `graph_relation_check`，确定性检查 2/2 passed。
   正式 Graph 保持 Revision 5，未 Apply，等待 product owner 确认。
+
+### 第二场景 Apply 后补充验收 · APPROVED
+
+- Product owner 已 Apply 最终 Candidate，正式图升为 Revision 6
+  (`revision-1e17e03f027d40858a9641a9025496b0`)；结构为 5 node + 4 edge + 2 hyperedge。
+- 服务重启后结构与两个业务域保持不变。首次三关系只读验收虽真实执行成功，但任务输出缺少
+  RelationCheckReceipt，暴露 Supervisor adapter 只返回 QueryReceipt 的缺口；未把模型声明误记为持久化证据。
+- GraphX `eac34ef` 返回、校验并持久化正式 Revision 的关系回执；存在回执时，权威公开回答改由回执
+  确定性生成。专项扩大回归 71 passed，部署后 PID 1160919。
+- 修复后任务 `agent-task-76f78030305b4957981dc39b3a49c51d` 在 Build Mode off 下完成三条关系检查：
+  BPM→SAP、SAP→财务出库、SAP→WMS 均为 20/capped。三份 typed receipt 精确绑定 Revision 6，
+  candidate_id/candidate_hash 均为空，并全部进入 Task output refs；未创建 Candidate。W-FLOW-007 APPROVED。
 
 ## 2026-09-02 W-POLISH-001 / W-META-001 · APPROVED / APPLY PENDING
 
