@@ -2,15 +2,28 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.6
+version: 1.7
 updated: 2026-09-02
 artifact_type: test-report
-source_revision: graphx@cb18047
+source_revision: graphx@a1508e9
 approver: test-engineer
 approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-02 W-FLOW-007 · APPROVED / APPLY PENDING
+
+- GraphX `08f7b95` 增加第二个 checked-in 场景 `跨系统出库一致性与异常定位`，按目录逐个加载
+  可用场景；该场景只使用 BPM/SAP 申请、SAP 销售出库、WMS 出库四张已有资源。
+- 首轮真实 E2E 暴露 GraphX 协调文本仍复制内部 Graph/node/task/hash。GraphX `d6b9d0a` 将
+  Supervisor 工具改为 semantic context，Artifact 按类型由服务器绑定，并在 Gateway 边界语义化委派与公开文本。
+- GraphX `a1508e9` 将 Tester 关系计划限定为变更超边的成员关系，并强制实际有序 receipts 与计划完全相等；
+  最终定向回归 79 passed，已推送并部署 PID 1134291。
+- 最终真实团队 Candidate `candidate:agent-task-eb4a564c513f4028b27f7653c59d7f72` 只有一个
+  `add hyperedge`；Preview 为 5 node + 4 edge + 2 hyperedge，未重复资源节点或修改现有关系。
+- Reviewer passed；Tester 在服务端强制下完成场景内 3/3 `graph_relation_check`，确定性检查 2/2 passed。
+  正式 Graph 保持 Revision 5，未 Apply，等待 product owner 确认。
 
 ## 2026-09-02 W-POLISH-001 / W-META-001 · APPROVED / APPLY PENDING
 

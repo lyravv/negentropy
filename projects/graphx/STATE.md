@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 4.0
+version: 4.1
 updated: 2026-09-02
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已部署 HEAD `cb18047`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `a1508e9`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **首个完整超图场景已闭环**：销售订单履约追踪已完成资源、构图、关系验证、Review/Test、用户 Apply、重启与查询验收 |
-| 测试状态 | 角色隔离/关系计划/目录迁移相关 74+60 项定向测试及新增迁移用例通过；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
-| 真实运行证据 | Reviewer/Tester 实际工具面无 skill/job/bash；公开消息为类型化短摘要；source_ref 迁移已 Apply，重启后 Revision 5 查询成功 |
-| 运行应用 | `cb18047` 已部署到 8001，重启后 PID `1089814`，健康；正式 Active Graph 为 Revision 5 |
-| 下一步 | W-POLISH-001/W-META-001 已闭环；选择第二个完整业务场景，验证构图团队的跨场景泛化 |
+| 当前阶段 | **第二场景 Candidate 已闭环待 Apply**：跨系统出库一致性在 Revision 5 上复用四节点/三关系，仅新增独立业务超边 |
+| 测试状态 | 第二场景与语义边界相关最终定向回归 **79 passed**；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
+| 真实运行证据 | GraphX 模型侧只见语义 Graph/产物类型；最终真实团队 Reviewer passed，Tester 强制完成场景内 3/3 relation receipts，2/2 deterministic checks passed |
+| 运行应用 | `a1508e9` 已部署到 8001，PID `1134291`；正式 Active Graph 仍为 Revision 5，Agent 未 Apply |
+| 下一步 | Product owner 在工作台确认最终 `跨系统出库一致性` Candidate；Apply 后重启并执行该业务域查询验收 |
 
 ## 项目批准者
 
