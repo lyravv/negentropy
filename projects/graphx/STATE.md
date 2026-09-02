@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 4.2
+version: 4.3
 updated: 2026-09-02
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `eac34ef`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `960bf5f`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **第二个完整场景已闭环**：跨系统出库一致性已 Apply 为 Revision 6，并完成重启持久性与三关系只读验收 |
-| 测试状态 | 第二场景/语义边界最终 79 passed；Apply 后回执缺口修复专项扩大回归 **71 passed**；此前基线 **262 passed + 13 subtests** |
+| 当前阶段 | **大图画布与关系语义已升级**：超边成为菱形语义实体，力导向拖拽/全屏/小地图/语义搜索/大规模成员选择已部署；新表关系使用 portable subtype |
+| 测试状态 | 本轮协议、Semantic Compiler、Harness、Canvas 源码专项 **60 passed**；TypeScript + Vite production build 通过；此前基线 **262 passed + 13 subtests** |
 | 真实运行证据 | Revision 6 为 5 node/4 edge/2 hyperedge；正式图三条场景关系各返回 20/capped，3 份 typed receipts 已持久化且 candidate binding 为空 |
-| 运行应用 | `eac34ef` 已部署到 8001，重启后 PID `1160919`；正式 Active Graph 为 Revision 6 |
-| 下一步 | 以第二场景的异常分类为目标补充聚合/差异查询能力，或选择第三个不同数据域验证跨数据域泛化；优先由产品目标决定 |
+| 运行应用 | `960bf5f` 已部署到 8001，重启后 PID `1282835`；正式 Active Graph 仍为 Revision 6，5 node/4 edge/2 hyperedge，未自动 Apply |
+| 下一步 | 产品负责人先实际试用新版大图交互；随后通过正常 Candidate 将 Revision 6 的四条 legacy table 关系补齐 subtype，或继续选择第三场景，不直接改正式 Revision |
 
 ## 项目批准者
 
@@ -60,6 +60,20 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
 ## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
+
+### 2026-09-02 · 可扩展超图画布与关系语义（已交付）
+
+- GraphX `960bf5f` 已将语义超边从重叠凸包改为可选择、可拖动的菱形实体，并通过
+  membership springs 连接成员节点；二元边和成员边进入同一 bounded force simulation。
+- 画布已提供全屏、小地图、节点/超边/关系语义搜索；搜索聚焦首个匹配项并二级高亮一跳邻域。
+- 超边成员编辑改为名称/说明搜索、类型筛选、显式添加/移除、selected chips/count 与每页 40 项，
+  不再为全图渲染 checkbox。
+- `table-table` 新生产者契约明确 `foreign_key / lineage / semantic_similarity / association`；
+  主外键必须有字段对。Canvas 客户端与服务端共同校验，Builder semantic contract 和两个场景提示均已同步。
+- 旧 Revision 的无 subtype 边保持可读但不猜测语义；正式 Revision 6 未被本次部署修改。若要让四条旧边获得
+  subtype 颜色和完整 Inspector 信息，应由 Builder/Canvas 生成 Candidate 后再由用户 Apply。
+- 验证：60 个协议/Compiler/Harness/Canvas 专项通过，production build 通过；8001 health、前端 hash 与
+  Revision 6 的 5/4/2 数据保留均通过，PID `1282835`。
 
 ### 2026-09-01 · 语义构图边界重构（已交付）
 

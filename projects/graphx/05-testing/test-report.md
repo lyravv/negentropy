@@ -2,15 +2,28 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.8
+version: 1.9
 updated: 2026-09-02
 artifact_type: test-report
-source_revision: graphx@eac34ef
+source_revision: graphx@960bf5f
 approver: test-engineer
 approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-02 W-GRAPH-UX-001 · APPROVED / DEPLOYED
+
+- 原始 HGT 规范与现实现对照确认：语义超边是一等实体，`table-table` 只是端点 profile；portable
+  relation subtype 为 foreign_key、lineage、semantic_similarity、association。
+- GraphX `960bf5f` 将凸包超边替换为 force-layout 菱形顶点与 membership springs，增加拖拽、全屏、
+  小地图、语义聚焦与一跳高亮；成员选择器改为 search/filter/chips/pagination。
+- Semantic Change、场景 contract、Builder prompt、HGT validation 与 Canvas server boundary 同步表关系语义；
+  foreign_key 缺字段对 fail closed，旧 Revision 无 subtype 边保持可读。
+- 协议/Compiler/Harness/Canvas 专项 `60 passed in 2.94s`；TypeScript + Vite production build 通过。
+  既有完整 TestClient 套件仍受已登记 httpx2 后台等待影响，本轮未将该挂起计为通过。
+- 已部署 8001 PID `1282835`；health 通过，页面返回新 JS/CSS hash，Revision 6 的 5 node/4 edge/2 hyperedge
+  保持不变。本轮无 Graph Candidate Apply。
 
 ## 2026-09-02 W-FLOW-007 · APPROVED / APPLIED
 
