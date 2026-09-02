@@ -25,6 +25,14 @@ downstream: [backend-engineer, orchestrator, devops-engineer]
 - Candidate `candidate:agent-task-e4363b2e8043479c8bd2185d430474b8` 仅含两个 node update；与
   Revision 4 的差异字段都且只有 `source_refs`。Review/Test passed，正式 Revision 仍为 4，等待用户 Apply。
 
+### source_ref Apply 后补充验收 · APPROVED
+
+- Product owner 已显式 Apply，正式 Graph 升为 Revision 5
+  (`revision-40bfd09e1c8846beb0d504b5e5cc92fd`)；两个历史节点均使用相同 connection namespace。
+- 服务重启到 PID 1089814 后仍为 5 node + 4 edge + 1 hyperedge。
+- 重启后任务 `agent-task-02f2eb603cba4b989ce54ab3a3c0ffef` 通过 `sales-order` 语义节点返回
+  1 条有界 sample；QueryReceipt 精确绑定 Revision 5 且 candidate_id 为空。W-META-001 APPROVED。
+
 ## 2026-09-01 W-FLOW-006 · TEAM E2E APPROVED / APPLY PENDING
 
 - GraphX `3d39eeb` 约束每个 Supervisor run 只接受一个权威 decision；`bd2c53f` 将无变化保护限定为

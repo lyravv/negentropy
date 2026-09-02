@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 3.9
+version: 4.0
 updated: 2026-09-02
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -29,9 +29,9 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **首个完整超图场景已闭环**：销售订单履约追踪已完成资源、构图、关系验证、Review/Test、用户 Apply、重启与查询验收 |
 | 测试状态 | 角色隔离/关系计划/目录迁移相关 74+60 项定向测试及新增迁移用例通过；此前基线 **262 passed + 13 subtests**；未伪称新全量通过 |
-| 真实运行证据 | Reviewer/Tester 实际工具面已无 skill/job/bash；公开消息为类型化短摘要；新 Tester 按 Candidate 计划完成 4 relation receipts + TestReport passed |
-| 运行应用 | `cb18047` 已部署到 8001，PID `1070145`，健康；正式 Active Graph 仍为 Revision 4 |
-| 下一步 | 用户 Apply `candidate:agent-task-e4363b2e8043479c8bd2185d430474b8`（仅两个节点 source_refs 改变）；随后重启查询验收，再选择第二业务场景 |
+| 真实运行证据 | Reviewer/Tester 实际工具面无 skill/job/bash；公开消息为类型化短摘要；source_ref 迁移已 Apply，重启后 Revision 5 查询成功 |
+| 运行应用 | `cb18047` 已部署到 8001，重启后 PID `1089814`，健康；正式 Active Graph 为 Revision 5 |
+| 下一步 | W-POLISH-001/W-META-001 已闭环；选择第二个完整业务场景，验证构图团队的跨场景泛化 |
 
 ## 项目批准者
 
