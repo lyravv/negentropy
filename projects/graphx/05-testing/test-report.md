@@ -2,15 +2,28 @@
 title: 测试报告 — GX-APP-015/016/017/018/021..025
 role: test-engineer
 status: APPROVED
-version: 1.5
-updated: 2026-09-01
+version: 1.6
+updated: 2026-09-02
 artifact_type: test-report
-source_revision: graphx@bd2c53f
+source_revision: graphx@cb18047
 approver: test-engineer
 approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-02 W-POLISH-001 / W-META-001 · APPROVED / APPLY PENDING
+
+- GraphX `5e3526e`/`71dc019` 关闭 Cordis spine 的 workspace/skill/bash/job/goal 工具，并逐次将
+  provider request/header 工具名与 server grant 比对；兼容 Harness schema-object header。
+- Reviewer/Tester 公开消息改为类型化报告的确定性短摘要，不再复制模型 final prose、finding/check
+  payload 或业务计数。真实 Reviewer 工具清单无 native tool。
+- GraphX `0bf3e48` 从精确 Candidate Preview 生成四条有序关系计划；真实 Tester 仅调用
+  `candidate_get`、四次 `graph_relation_check`、`test_run`，四份 receipt 与 TestReport 均 passed。
+- GraphX `cb18047` 修复历史 SourceTable 主键/连接 upsert；五表目录 alias 已统一到 connection namespace。
+  Query authorization 使用精确 connection/schema/table，目录刷新后 Revision 4 只读查询仍成功。
+- Candidate `candidate:agent-task-e4363b2e8043479c8bd2185d430474b8` 仅含两个 node update；与
+  Revision 4 的差异字段都且只有 `source_refs`。Review/Test passed，正式 Revision 仍为 4，等待用户 Apply。
 
 ## 2026-09-01 W-FLOW-006 · TEAM E2E APPROVED / APPLY PENDING
 
