@@ -2,8 +2,8 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 4.3
-updated: 2026-09-02
+version: 7.0
+updated: 2026-09-07
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，已推送并部署 HEAD `960bf5f`） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，本地 HEAD `fa351ce`；**尚未 push**——gitHub 网络在本环境不可达，`ahead origin 1`） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **大图画布与关系语义已升级**：超边成为菱形语义实体，力导向拖拽/全屏/小地图/语义搜索/大规模成员选择已部署；新表关系使用 portable subtype |
-| 测试状态 | 本轮协议、Semantic Compiler、Harness、Canvas 源码专项 **60 passed**；TypeScript + Vite production build 通过；此前基线 **262 passed + 13 subtests** |
-| 真实运行证据 | Revision 6 为 5 node/4 edge/2 hyperedge；正式图三条场景关系各返回 20/capped，3 份 typed receipts 已持久化且 candidate binding 为空 |
-| 运行应用 | `960bf5f` 已部署到 8001，重启后 PID `1282835`；正式 Active Graph 仍为 Revision 6，5 node/4 edge/2 hyperedge，未自动 Apply |
-| 下一步 | 产品负责人先实际试用新版大图交互；随后通过正常 Candidate 将 Revision 6 的四条 legacy table 关系补齐 subtype，或继续选择第三场景，不直接改正式 Revision |
+| 当前阶段 | **Workspace Resource Center 与 Graph Resource Binding 已交付并部署**：Database/API/Document/Ontology 统一为 Workspace 资源（重建资源），Graph 只持有明确使用授权（`GraphResourceBinding`）和 Graph-local 运行绑定，已无清库部署到 8001 并 HTTP 闭环验证 |
+| 测试状态 | conformance 清单为 145 项：139 implemented、6 planned。**`fa351ce` 全绿：126 conformance + 44 位（resource/workbench）通过，前端 production build 通过**；全量/TestClient 套件仍受既有后台等待问题影响，不声明全量通过 |
+| 真实运行证据 | 两个完整语义场景已通过团队构建并 Apply；30 问题隔离运行 30/30 HTTP 完成，最终三个编排缺陷已定向修复；仍有 2 个 Graph 覆盖缺口、2 个历史 golden 漂移、2 个代理/数据质量限制。**W-GENERIC-SEM-001F 已无清库部署到 8001（main PID 1320551）并验证**：旧连接/准入自动提升为 WorkspaceResource+Binding（connection_id 保持），active `123` 5 节点仍可解析；临时 Graph 上 HTTP 闭环 create→test→bind→unbind→delete-protect→delete 全部通过，生产 3 Graph 无损 |
+| 运行应用 | 8001 已用当前 HEAD 重部署（`fa351ce`，main PID 1320551）并健康；`/openapi.json` 现含 `workspace-resources` 端点（30 条 path）；API Connection→OpenAPI scan→operation import 临时 Graph HTTP 闭环通过并已清理；原有 3 Graph（`123`/`abc`/`合同履约全链路场景验证`）全保留、revision 不变 |
+| 下一步 | 把 `fa351ce` push 到 github（网络恢复后）；随后补用户 Document/Ontology 导入（当前 `New resource` 只能建 database/api，doc/ontology 只能靠托管注册表），再继续 session-bound 文档导出、完整 ontology reasoner 与未见场景泛化验收 |
 
 ## 项目批准者
 
@@ -51,15 +51,152 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **ACTIVE** | 当前主线为完整场景所需资源目录、语义超边和关系验证工具 |
-| 5 测试 | test-engineer | **ACTIVE** | 建立“销售订单履约追踪”完整团队 E2E，而非继续扩大孤立查询样本 |
-| 6 发布 | devops-engineer | **DONE（当前里程碑）** | `9bea7fe` 已部署，宿主 health/OpenAPI/diagnostics/bootstrap 与数据保留检查通过 |
-| 7 复盘 | orchestrator | **DONE** | 2026-08-31 完成项目目标/完成度/不可用断点复盘；用户确认 SQL 验证应前置 |
+| 4 实现 | frontend ∥ backend | **IN_PROGRESS** | Workspace Resource Center / 注册 API/文档/本体节点、语义创建、原生 DSH 执行、异构生命周期与 Graph 级准入已交付；下一切片补用户 Document/Ontology 导入 |
+| 5 测试 | test-engineer | **READY** | 当前 30 问题冻结为回归资产；下一质量门禁使用全新未见场景检验泛化 |
+| 6 发布 | devops-engineer | **DONE（当前里程碑）** | `fa351ce` 已本地提交（尚未 push）；8001 已无清库重部署、迁移与 HTTP 闭环验证通过 |
+| 7 复盘 | orchestrator | **DONE** | 2026-09-03 完成第二次项目级复盘：从场景正确率优化转向通用构图产品化 |
 
 > 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
-## 下一步动作（权威完整清单在 `graphx/spec/06`「Continue in this order」）
+## 当前产品判断与新路线（2026-09-03）
+
+### 产品目标
+
+GraphX 不是一个针对固定问题集编写查询函数的问答应用。它的核心产品是：让用户把受控数据源交给
+一个可审计的 Agent team，由模型只表达业务语义，服务端 Resolver/Compiler 管理技术身份与并发，
+经 Candidate、独立 Review/Test 和用户 Apply 形成可执行的不可变超图；之后 GraphX 通过该图回答问题，
+并把证据绑定到精确 Revision。
+
+### 当前完成度
+
+| 层级 | 结论 | 已有证据 |
+|---|---|---|
+| HGT 与控制面 | 基本成型 | Bundle/Patch、不可变 Revision、Candidate、Review/Test、用户 Apply、typed receipts、诊断与权限门禁均已实现 |
+| Agent 构图团队 | 已跑通 Alpha | GraphX/Builder/Reviewer/Tester 独立 Harness、语义工具、动态任务图、关系验证和两次正式场景 Apply 已验证 |
+| 数据可执行性 | 已跨过“空壳图”阶段 | Graph-owned connection/catalog、节点来源绑定、Candidate Preview/Revision 受控 SQL 与 relation check 可用 |
+| 工作台体验 | 已具备大图基础 | 超边实体、力导向拖拽、全屏/小地图、搜索聚焦、一跳高亮和可扩展成员选择已交付 |
+| 业务问答 | 当前场景可用，但尚未证明通用 | 30/30 HTTP 完成，关键语义缺陷已修复；部分能力依赖 `question_executor.py` 的服务端确定性 Profile |
+| 生产平台 | 未完成 | 多租户授权、生产 Graph store/原子 outbox、对象存储、OS 级隔离、凭据 broker 与组织库生命周期仍是后续工程 |
+
+### 暂停项
+
+- 暂停继续修 q021/q029 golden 漂移、q028 供应商归因和当前 30 问题的逐题优化；保留为冻结回归/数据治理事项。
+- 失败诊断详情 UI、超时/方言/广泛脱敏评测继续保持 deferred，不抢占构图主线。
+- 不把新的业务问题继续固化成 Python `profile_name -> handler` 分支；已有 Profile 作为基线与迁移样本。
+
+### W-ALIGN-001 对齐结果
+
+- 入口 README 和 SPEC 已改为当前 GraphX/Builder/Reviewer/Tester、语义 Compiler、数据连接与受控查询主链；
+  早期“只有 Builder/两张表”表述已删除。
+- manifest 进入 `generalizable-semantic-construction` 阶段，30 问题明确为冻结回归，
+  `graph_owned_executable_semantics` 明确为尚未完成。
+- `spec/06` 现在先给出唯一的当前继续顺序，时间累积内容降为历史交付记录。
+- 14 个 planned requirement 已逐项核查：8 个凭现有或新增直接测试转为 implemented；6 个真实缺口保持 planned，
+  分别是投影重建、golden OS 隔离、原子 Apply/outbox、完整运行指纹、提示注入防护和全链路脱敏。
+
+### W-JOURNEY-001A 通用资源目录（已交付到 WORKTREE）
+
+- PostgreSQL 连接现在保留用户配置的 Schema；新 `scan` 路径只读 `information_schema`，最多返回
+  200 张表及字段元数据，预览不会写入 SourceTable。
+- 新 `import` 路径只接受用户明确选择的 `(schema_name, table_name)`；服务端会重新扫描并拒绝重复、
+  伪造或过期选择，只把获批资源及其 connection provenance 写入当前 Graph catalog。
+- 工作台在新增 Database 连接后打开可搜索资源选择器，连接列表也可再次进入；支持过滤结果批量选择、
+  显式 selected count 和逐项增删，不读取业务行、不把连接秘密交给模型。
+- ADR-017 与 GX-APP-056 已记录。旧 13 表发现仅保留兼容，不再是通用构图目标。
+
+### W-JOURNEY-001B 通用 Builder 语义投影（已交付到 WORKTREE）
+
+- `graph_semantic_context_get` 现在为任何用户批准的目录资源生成有界、确定性的字段角色摘要，
+  不读取业务行，也不要求命中 checked-in scenario。
+- 服务端只从精确且类型兼容的标识字段生成最多 100 条关系线索；线索只能支持
+  `association`，明确声明不是数据库外键、血缘或业务方向。无证据则不输出关系线索。
+- Builder prompt 要求保留元数据字段对与理由；没有用户陈述、scenario 或 hint 支持时只构建
+  有依据的节点，并指出关系含义/连接证据仍需澄清。
+- 冻结的客服领域 fixture（客户账户、客服工单、客服排班）证明：无内置场景时可编译三节点和
+  一条有依据的账户—工单 association，且不会把无依据的排班表强行连入。
+- GX-APP-057 已登记；相关核心组合 62 项、资源目录独立 3 项通过。未提交、未部署、未 Apply。
+
+### W-JOURNEY-001C 通用黄金旅程门禁（已交付到 WORKTREE）
+
+- 同一冻结客服 fixture 从空 Mine Graph 生成语义 Candidate；Reviewer 读取精确 diff 并提交独立
+  ReviewReport，Tester 对同一 Candidate 提交独立 TestReport，期间正式 Graph 不变。
+- 非 user actor 的 Apply 被拒绝；显式 user Apply 创建不可变 Revision 2；随后受控查询产生绑定该
+  Revision 的 QueryReceipt。全程 `semantic_scenarios=()`，没有业务专属 handler。
+- GX-APP-058 已登记，最终专项 4 passed；W-JOURNEY-001 达到当前 Alpha 验收并转为 DONE。
+
+### W-SEMEXEC-001 错误方向试验（已撤回）
+
+- 产品负责人指出，“合同额、商机额”等只是业务语义，GraphX 不应判断数据库内容属于指标、流程
+  或其他业务门类；它们应继续使用通用节点、本体节点和语义超边表达。
+- 未提交、未部署、未 Apply 的 executable-metric 代码、ADR、Schema、prompt、测试和 requirement 已从
+  GraphX WORKTREE 撤回；通用资源目录、Builder 语义投影和黄金旅程成果保留。
+- C-006 固化边界：未来新增平台级语义类别前，必须先证明现有 HGT 通用原语无法表达，并取得明确
+  产品决策；不能从某个业务问题或查询实现反推产品本体。
+
+### W-GENERIC-SEM-001A 注册资源节点与原生 DSH 工具（已交付到 WORKTREE）
+
+- API、文档与 ontology 仍是 HGT 的通用节点类型，而不是 GraphX 对业务内容的分类。部署侧注册表保存
+  不可变执行定义；Builder 只按 `resource_name` 和语义名称创建节点，Compiler 注入 node ID、来源证据与运行绑定。
+- `graph_semantic_context_get` 只向模型投影方法/schema、文档目录/AST schema、ontology 领域/schema/支持任务等
+  安全语义；URL、认证、artifact 路径、持久 ID 与 hash 均留在服务端。
+- GraphX/Reviewer/Tester 通过原生 DSH `api_query`、`doc_execute`、`ontology_execute` 调用精确 Revision 中的节点；
+  文档检索和 ontology 规则推理保持不同工具边界，旧 MCP server 不进入产品运行架构。
+- HGT `node_refs` 增加 `ontology_nodes`，混合语义超边可同时包含 table/api/doc/graph/ontology 节点。
+- 已迁移脱敏的 TPT 文档与订单履约 ontology 注册样例。API 执行支持受 schema 约束的 GET query/POST JSON；
+  认证 broker 与用户可见注册入口仍属后续切片。
+- GX-SEM-008、GX-HGT-008、GX-HARNESS-010、GX-APP-059 已登记为 implemented；专项验证见测试报告。
+
+### W-GENERIC-SEM-001B 异构关系与显式解绑删除（已交付到 WORKTREE）
+
+- 注册 API/文档/ontology 节点可通过 `update_registered_node` 修改语义名称或说明；Compiler 保留节点 ID，
+  并从精确注册项重新绑定受保护运行契约，模型不能修改 URL、artifact 或 runtime。
+- `connect_nodes` 根据有向端点类型推导 HGT `relation_type`，校验规范 subtype；当前覆盖 api-api、doc-doc、
+  table-api、table-doc、api-doc、ontology-table、api-ontology。规范未定义的方向不会自动反转，而是要求澄清或改用超边。
+- `disconnect_nodes`、`remove_semantic_hyperedge` 与 `remove_node` 提供非级联删除语义；节点仍被边或超边引用时
+  返回 `SEMANTIC_NODE_IN_USE`，必须先显式解绑。Compiler 为更新/删除注入当前实体 precondition hash 与证据。
+- GX-SEM-009 已登记 implemented；相关组合 82 passed，通用黄金旅程 4 passed，未提交、未部署、未 Apply。
+
+### W-GENERIC-SEM-001C 原生文档/本体目录执行（已交付到 WORKTREE）
+
+- 常用 `doc_execute(listdocs/search/extract_section)` 已直接读取服务端托管 Document AST；常用
+  `ontology_execute(list_concepts/search_terms/get_mapping/list_rules/explain_rule/plan_evidence)` 已直接读取版本化 artifact。
+- 物理路径只由隐藏的 `env:` 引用解析，路径逃逸、缺失/超大/损坏 artifact 均 fail closed；返回内容有界且不含绝对路径。
+- 移除了隐式 localhost 服务假设。文档文件导出需要显式 session-workspace adapter；ontology
+  `classify/validate/infer` 需要显式 reasoner adapter，未配置时返回结构化 unavailable，而不是伪造结果。
+- 对用户提供的旧预研资产完成只读 smoke：8 份文档可列举，“信创”检索返回 3 条有界结果；本体读取
+  16 个概念并规划出 9 个表节点。未启动 MCP/旧 HTTP 服务，未输出文档正文、业务行或物理路径。
+- GX-HARNESS-011 已登记 implemented；相关组合 85 passed，黄金旅程 4 passed，前端 build 通过。
+
+### W-GENERIC-SEM-001D Graph 级注册资源准入（已交付到 WORKTREE）
+
+- 部署注册表现在只表示系统资源库存，不会再把全部 API、文档、本体资源自动暴露给每个 Graph。
+- Mine Graph 用户通过工作台选择资源；服务端保存 Graph-scoped admission，并在 Builder 绑定、Candidate
+  校验与 Apply 复验时只解析当前 Graph 已准入的资源。新 Graph 默认没有任何准入，Graph 之间不继承。
+- Bootstrap 仅返回不透明 key、名称、类型、说明和准入状态，不暴露 registry source ref、运行路由或物理路径。
+- 当前 Revision 或开放 Candidate 仍引用注册节点时，移除准入 fail closed，要求先通过 Candidate 解绑。
+- GX-APP-060 已登记 implemented；原生资源与准入专项 11 passed、production build 通过。
+  TestClient 专项受既有 httpx/background wait 停滞，未计为通过；未提交、未部署、未 Apply。
+
+### 新实施顺序
+
+1. **W-ALIGN-001 · 权威叙事收敛（DONE）**：GraphX README、SPEC、manifest、handoff 与 conformance
+   状态已对齐；W-JOURNEY-001B 后 135 项 requirement 当前为 129 implemented / 6 planned。
+2. **W-JOURNEY-001 · 通用构图黄金旅程（DONE）**：空 Graph 到可查询 Revision 已由冻结非订单
+   catalog 覆盖 schema/resource、语义 Candidate、diff、Review/Test、用户 Apply 和精确 Revision 查询门禁。
+3. **W-GENERIC-SEM-001 · 通用业务概念建模（IN_PROGRESS）**：001A/B/C/D/E/F 已交付注册 API/文档/本体节点、
+    混合超边、原生 DSH 执行、异构关系、显式解绑删除、常用目录读取、Graph 级用户准入和 **Workspace Resource Center**
+    （已部署+HTTP 验证）；下一切片补 **用户 Document/Ontology 导入**、session-bound 导出、完整 reasoner、
+    部署注册管理与认证 broker。
+4. **W-GENERALIZE-001 · 未见场景泛化验证**：选择一个中等规模、此前未用于开发的场景，禁止新增场景专属
+   Python handler；衡量构建成功率、澄清准确性、工具调用/返工次数、Candidate 语义正确性和 Apply 后问答正确性。
+5. **W-PLATFORM-001 · 生产化门禁**：在通用性成立后再排多租户、Postgres/object store、atomic Apply/outbox、
+   credential broker/隔离、组织库生命周期和扩大故障评测。
+
+> `graphx/spec/06-testing-and-handoff.md` 当前包含大量按时间累积的旧 continuation 段落；在
+> W-ALIGN-001 完成前，本节是 negentropy 的项目优先级快照，但 GraphX 行为真相仍只由其 `spec/` 和测试决定。
+
+## 历史交付记录
 
 ### 2026-09-02 · 可扩展超图画布与关系语义（已交付）
 

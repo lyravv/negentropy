@@ -1,16 +1,97 @@
 ---
-title: 测试报告 — GX-APP-015/016/017/018/021..025
+title: 测试报告 — GX-APP-015/016/017/018/021..025 + 通用资源/Workspace Resource Center
 role: test-engineer
 status: APPROVED
-version: 1.9
-updated: 2026-09-02
+version: 3.0
+updated: 2026-09-07
 artifact_type: test-report
-source_revision: graphx@960bf5f
+source_revision: graphx@fa351ce
 approver: test-engineer
-approval_evidence: W-FLOW-006 formal Chat complete team run; focused guard regression 31 passed; prior W-FLOW-005 73 tests + 13 subtests
+approval_evidence: fa351ce 全绿 126 conformance + 44 unit；无清库部署到 8001；HTTP 闭环验证；3 生产 Graph 无损
 upstream: [05-testing/test-plan.md, 05-testing/defect-log.md]
 downstream: [backend-engineer, orchestrator, devops-engineer]
 ---
+
+## 2026-09-07 W-GENERIC-SEM-001F · APPROVED / DEPLOYED (commit `fa351ce`)
+
+- Workspace Resource Center 与 Graph Resource Binding 已交付、提交并部署：
+  - `graphx` 新 HEAD `fa351ce`（59 文件，+6822/−198），working tree clean；
+  - 全绿：`tests/conformance/`（126 passed, 6.81s）+ `test_resource_executor`/`test_alpha_app`/
+    `test_harness_executor`/`test_workbench_*`（44 passed）+ Web production build 通过。
+- 生命周期验证（无清库部署到 8001，main PID 1320551）：`/health` ok，`/openapi.json` 新增
+  `resources`、`resources/{id}`、`resources/{id}/test`、`graphs/{id}/resources`（30 条 path）。
+- 迁移验证：旧 GraphCollation 提升为 `WorkspaceResource`+`GraphResourceBinding`，connection_id
+  保持（active `123` 节点仍可解析）；bootstrap 返回 `workspace_resources`(6) + `graph_resources`；
+  3 生产 Graph（`123` rev7 / `abc` rev1 / `合同履约全链路场景验证` rev2）全保留、revision 不变。
+- HTTP 闭环（临时 Graph + 临时 API 资源，隔离运行）：create→test(`connected`)→bind→bootstrap
+  可见(graph_resources 命中+per-graph connection_id)→unbind(清空)→delete 保护(409 RESOURCE_IN_USE)→
+  delete resource(200)→delete graph(200)，全程未污染生产 Graph。
+- `fa351ce` 本地已提交、**未 push**（gitHub 网络在本环境不可达，ahead origin 1）。
+- 已知后续：用户 Document/Ontology 导入（New resource 现仅 database/api）登记为 W-GENERIC-SEM-001G。
+
+## 2026-09-04 W-GENERIC-SEM-001C · APPROVED / WORKTREE
+
+- Document AST 的 list/search/extract_section 和 ontology 的 concept/term/mapping/rule/plan
+  目录操作已由 GraphX Alpha executor 进程内执行，不再依赖旧 MCP 或隐式 localhost 服务。
+- 合成 fixture 验证托管 `env:` 引用、路径隐藏、精确 doc/section 标识与 ontology evidence plan；
+  artifact 最大 5 MB、结果最大 40k 字符，路径逃逸/缺失/损坏均结构化失败。
+- 对产品负责人指定的旧预研资产做了只读 smoke：doc list 8、搜索 3 个有界命中；ontology concepts 16、
+  required table nodes 9。输出只记录数量，未记录正文、规则内容、业务行或绝对路径。
+- 相关组合 `85 passed in 2.95s`；通用资源/黄金旅程 `4 passed in 1.10s`；Web production build 通过。
+- 文档导出和 ontology 完整推理仍须显式 adapter；API 凭据 broker 未实现。本切片未提交、未部署、未 Apply。
+
+## 2026-09-04 W-GENERIC-SEM-001B · APPROVED / WORKTREE
+
+- `update_registered_node` 只允许更新 API/文档/ontology 的语义名称或说明；测试确认持久节点 ID 与
+  server-owned `request_info` 保持不变。
+- `connect_nodes` 从有向节点类型推导 HGT relation type，限制 relation subtype；API→文档和
+  API→ontology 正向覆盖通过，doc→ontology 等规范未定义方向返回结构化错误。
+- 被边/超边使用的节点直接删除返回 `SEMANTIC_NODE_IN_USE`；先执行 `disconnect_nodes` 与
+  `remove_semantic_hyperedge` 后，同一 Patch 的 `remove_node` 带显式依赖、实体 precondition 与证据并可原子应用。
+- Compiler/Harness/Schema/HGT/spec/连接组合 `82 passed in 2.83s`；通用资源/黄金旅程
+  `4 passed in 0.91s`；Python compile、JSON parse、`git diff --check` 通过。
+- 未执行真实外部 API/文档/ontology 服务调用，未提交、未部署、未 Apply；注册管理与凭据 broker 是下一切片。
+
+## 2026-09-04 W-GENERIC-SEM-001A · APPROVED / WORKTREE
+
+- Builder 通过 `createApiNode`、`createDocumentNode`、`createOntologyNode` 引用服务端注册资源；测试确认
+  semantic context 不暴露 URL、认证、artifact path、source ref、持久 ID 或 hash。
+- Compiler 为三类节点生成正式 HGT Patch，并支持 table/api/doc/graph/ontology 混合超边；原生 DSH
+  `api_query`、`doc_execute`、`ontology_execute` 只接受语义节点名，由 Gateway 在精确 Revision 中解析 ID。
+- Alpha executor 验证 API 参数 schema 并限定 GET query/POST JSON；文档与本体调用由服务端注入真实 node ID，
+  ontology `infer` 只接受 `workspace://` 查询结果引用，不接受模型自带规则或 facts。
+- 验证：Core/DSH/规范组合 `81 passed in 2.24s`；连接绑定门禁 `9 passed in 0.94s`；通用资源/黄金旅程
+  `4 passed in 1.04s`；TypeScript + Vite production build 通过；Python compile、JSON parse、`git diff --check` 通过。
+- 一次更大的组合回归在既有 Alpha/Workbench 后台等待路径停滞，无失败输出后中止，因此不声明全量通过。
+  本切片未提交、未部署、未 Apply；真实文档/本体调用仍要求对应服务进程，API 认证 broker 留作后续。
+
+## 2026-09-03 W-SEMEXEC-001 · WITHDRAWN / WORKTREE
+
+- 产品负责人判定 executable-metric 将业务分类错误提升为 GraphX 平台本体；该方向不满足产品边界。
+- 对应代码、ADR、Schema、prompt、测试与 requirement 已撤回；未提交、未部署、未 Apply 正式 Graph。
+- 通用资源目录、Builder 语义投影与黄金旅程保留；撤回后的 HGT、Compiler、Gateway、Harness、契约与
+  三项通用旅程组合回归 `75 passed`，conformance 清单恢复为 136 项（130 implemented / 6 planned）。
+
+## 2026-09-03 W-JOURNEY-001B · APPROVED / WORKTREE
+
+- 新增 GX-APP-057：任意用户批准的 catalog 都获得确定性字段角色摘要与保守元数据关系线索，
+  不依赖 checked-in scenario，也不读取业务行。
+- 关系 hint 仅在精确标识字段名与类型兼容时产生，最多 100 条，只能建议 `association`；明确禁止
+  推断数据库外键、血缘或业务方向。Builder 无证据时只提交有依据的节点并请求补充关系语义。
+- 冻结客服 fixture 覆盖客户账户、客服工单、客服排班：只产生账户 `id` 到工单
+  `customer_account_id` 的线索，排班资源无伪造关系；同一语义操作可编译 3 节点 + 1 association Candidate。
+- Builder/Gateway/Harness/规范/Compiler 核心组合 `62 passed`；资源目录独立 `3 passed`；JSON、diff check
+  通过。包含 workbench 的较大组合仍复现既有后台等待，本轮在 17 项后中止，不计作完整结果。
+- 001B 本身未提交、未部署、未 Apply；其后的 001C 全通用生命周期验收见下。
+
+### W-JOURNEY-001C 补充验收 · APPROVED / WORKTREE
+
+- 同一客服 fixture 在 `semantic_scenarios=()` 下，从空 Mine Graph 依次完成 semantic Candidate、
+  Candidate diff、独立 ReviewReport、独立 TestReport、显式 user Apply 和 Revision-bound query。
+- 验证 Builder 身份不能 Apply；user Apply 后正式图从 Revision 1 进入 Revision 2；后续 QueryReceipt
+  的执行快照精确使用 Revision 2 与“客服工单”语义节点。
+- 新增 GX-APP-058；黄金旅程/语义/规范最终组合 `4 passed`。测试内 Apply 只作用于隔离临时 SQLite，
+  未修改部署 Graph；本轮仍未提交、未部署。
 
 ## 2026-09-02 W-GRAPH-UX-001 · APPROVED / DEPLOYED
 
