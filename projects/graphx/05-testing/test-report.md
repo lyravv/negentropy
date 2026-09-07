@@ -26,7 +26,7 @@ downstream: [backend-engineer, orchestrator, devops-engineer]
 - HTTP 闭环（临时 Graph + 临时 API 资源，隔离运行）：create→test(`connected`)→bind→bootstrap
   可见(graph_resources 命中+per-graph connection_id)→unbind(清空)→delete 保护(409 RESOURCE_IN_USE)→
   delete resource(200)→delete graph(200)，全程未污染生产 Graph。
-- `fa351ce` 本地已提交、**未 push**（gitHub 网络在本环境不可达，ahead origin 1）。
+- `fa351ce` 本地已提交并 **push** `origin/feat/trusted-build-core`。
 - 已知后续：用户 Document/Ontology 导入（New resource 现仅 database/api）登记为 W-GENERIC-SEM-001G。
 
 ## 2026-09-04 W-GENERIC-SEM-001C · APPROVED / WORKTREE
