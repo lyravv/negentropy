@@ -2,7 +2,7 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 7.3
+version: 7.4
 updated: 2026-09-09
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
@@ -23,15 +23,15 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.9 WORKTREE** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `3e60697`，已推送 origin） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `0939e8d`，已推送 origin） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **Chat 显式语义引用 DONE**：Resource/node/edge/hyperedge 引用已贯通消息、服务端解析、Context Pack、Harness 提示与工作台；大图搜索和 Canvas 快捷引用已补齐 |
-| 测试状态 | Resource Manager/作用域/资源中心与运行时专项 56 passed + 14 subtests；Chat 引用最终相关回归 18 passed，前端 production build、Python compile、diff check 通过；真实 Harness 引用 smoke 已验证语义命中与 selector 隔离；完整 conformance 仍受既有 TestClient 后台等待问题影响，不声明全量通过 |
+| 当前阶段 | **上下文式引用体验 DONE**：Standalone 引用按钮与含义不清的 Import to Graph 已移除；Resource/MySpace 文件与选中文本/Canvas 节点、边、超边统一从对象右键加入对话 |
+| 测试状态 | Resource Manager/作用域/资源中心与运行时专项 56 passed + 14 subtests；上下文式引用相关回归 18 passed，前端 production build、Python compile、diff check 通过；真实 Harness 文件选段 smoke 已验证精确语义命中与 selector 隔离；完整 conformance 仍受既有 TestClient 后台等待问题影响，不声明全量通过 |
 | 真实运行证据 | 两个完整语义场景已通过团队构建并 Apply；30 问题隔离运行 30/30 HTTP 完成，最终三个编排缺陷已定向修复；仍有 2 个 Graph 覆盖缺口、2 个历史 golden 漂移、2 个代理/数据质量限制。**W-GENERIC-SEM-001F 已无清库部署到 8001（main PID 1320551）并验证**：旧连接/准入自动提升为 WorkspaceResource+Binding（connection_id 保持），active `123` 5 节点仍可解析；临时 Graph 上 HTTP 闭环 create→test→bind→unbind→delete-protect→delete 全部通过，生产 3 Graph 无损 |
-| 运行应用 | 8001 为 0.5.9 WORKTREE（PID 1666790），健康；4 Graph、9 Workspace resources、11 Chat 保留。Database Schema 整体授权与完整 Chat 语义引用体验均已部署 |
-| 下一步 | 进入新的未见场景泛化验收：冻结场景后从资源接入、团队构图、Review/Test、用户 Apply 预演到代表性问答，全程禁止新增场景专属 handler |
+| 运行应用 | 8001 为 0.5.9 WORKTREE（PID 1769144），健康；4 Graph、9 Workspace resources、11 Chat 保留。输入框布局与上下文式引用已部署 |
+| 下一步 | 进入新的未见场景泛化验收，全程禁止新增场景专属 handler |
 
 ## 项目批准者
 
