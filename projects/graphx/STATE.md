@@ -2,8 +2,8 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 7.0
-updated: 2026-09-07
+version: 7.3
+updated: 2026-09-09
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
@@ -22,16 +22,16 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 
 | 项 | 值 |
 |---|---|
-| 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.7** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `fa351ce`，**已 push** `origin/feat/trusted-build-core`，与远端同步） |
+| 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.9 WORKTREE** |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `3e60697`，已推送 origin） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
 | 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **Workspace Resource Center 与 Graph Resource Binding 已交付并部署**：Database/API/Document/Ontology 统一为 Workspace 资源（重建资源），Graph 只持有明确使用授权（`GraphResourceBinding`）和 Graph-local 运行绑定，已无清库部署到 8001 并 HTTP 闭环验证 |
-| 测试状态 | conformance 清单为 145 项：139 implemented、6 planned。**`fa351ce` 全绿：126 conformance + 44 位（resource/workbench）通过，前端 production build 通过**；全量/TestClient 套件仍受既有后台等待问题影响，不声明全量通过 |
+| 当前阶段 | **Chat 显式语义引用 DONE**：Resource/node/edge/hyperedge 引用已贯通消息、服务端解析、Context Pack、Harness 提示与工作台；大图搜索和 Canvas 快捷引用已补齐 |
+| 测试状态 | Resource Manager/作用域/资源中心与运行时专项 56 passed + 14 subtests；Chat 引用最终相关回归 18 passed，前端 production build、Python compile、diff check 通过；真实 Harness 引用 smoke 已验证语义命中与 selector 隔离；完整 conformance 仍受既有 TestClient 后台等待问题影响，不声明全量通过 |
 | 真实运行证据 | 两个完整语义场景已通过团队构建并 Apply；30 问题隔离运行 30/30 HTTP 完成，最终三个编排缺陷已定向修复；仍有 2 个 Graph 覆盖缺口、2 个历史 golden 漂移、2 个代理/数据质量限制。**W-GENERIC-SEM-001F 已无清库部署到 8001（main PID 1320551）并验证**：旧连接/准入自动提升为 WorkspaceResource+Binding（connection_id 保持），active `123` 5 节点仍可解析；临时 Graph 上 HTTP 闭环 create→test→bind→unbind→delete-protect→delete 全部通过，生产 3 Graph 无损 |
-| 运行应用 | 8001 已用当前 HEAD 重部署（`fa351ce`，main PID 1320551）并健康；`/openapi.json` 现含 `workspace-resources` 端点（30 条 path）；API Connection→OpenAPI scan→operation import 临时 Graph HTTP 闭环通过并已清理；原有 3 Graph（`123`/`abc`/`合同履约全链路场景验证`）全保留、revision 不变 |
-| 下一步 | push 已完成（`fa351ce` 已在远端）；随后补用户 Document/Ontology 导入（当前 `New resource` 只能建 database/api，doc/ontology 只能靠托管注册表），再继续 session-bound 文档导出、完整 ontology reasoner 与未见场景泛化验收 |
+| 运行应用 | 8001 为 0.5.9 WORKTREE（PID 1666790），健康；4 Graph、9 Workspace resources、11 Chat 保留。Database Schema 整体授权与完整 Chat 语义引用体验均已部署 |
+| 下一步 | 进入新的未见场景泛化验收：冻结场景后从资源接入、团队构图、Review/Test、用户 Apply 预演到代表性问答，全程禁止新增场景专属 handler |
 
 ## 项目批准者
 
@@ -51,7 +51,7 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 1 业务 | business-liaison | SKIPPED（existing-spec） | 替代事实源：`spec/01` 产品范围；revision 跟随当前 graphx WORKTREE |
 | 2 需求 | product-manager | SKIPPED（existing-spec） | 替代事实源：`spec/01/09/10/12`；revision 跟随当前 graphx WORKTREE |
 | 3 架构 | architect | SKIPPED（existing-spec） | 替代事实源：`spec/02/05/08` + `spec/contracts`；revision 跟随当前 graphx WORKTREE |
-| 4 实现 | frontend ∥ backend | **IN_PROGRESS** | Workspace Resource Center / 注册 API/文档/本体节点、语义创建、原生 DSH 执行、异构生命周期与 Graph 级准入已交付；下一切片补用户 Document/Ontology 导入 |
+| 4 实现 | frontend ∥ backend | **IN_PROGRESS** | Resource Manager role/skills、Graph-local/Workspace scope 与显式发布已在 WORKTREE；本轮修复资源菜单裁剪并将 Database 授权收敛到配置 Schema |
 | 5 测试 | test-engineer | **READY** | 当前 30 问题冻结为回归资产；下一质量门禁使用全新未见场景检验泛化 |
 | 6 发布 | devops-engineer | **DONE（当前里程碑）** | `fa351ce` 已本地提交并 **push** `origin/feat/trusted-build-core`；8001 已无清库重部署、迁移与 HTTP 闭环验证通过 |
 | 7 复盘 | orchestrator | **DONE** | 2026-09-03 完成第二次项目级复盘：从场景正确率优化转向通用构图产品化 |
@@ -186,7 +186,7 @@ GraphX 不是一个针对固定问题集编写查询函数的问答应用。它�
    catalog 覆盖 schema/resource、语义 Candidate、diff、Review/Test、用户 Apply 和精确 Revision 查询门禁。
 3. **W-GENERIC-SEM-001 · 通用业务概念建模（IN_PROGRESS）**：001A/B/C/D/E/F 已交付注册 API/文档/本体节点、
     混合超边、原生 DSH 执行、异构关系、显式解绑删除、常用目录读取、Graph 级用户准入和 **Workspace Resource Center**
-    （已部署+HTTP 验证）；下一切片补 **用户 Document/Ontology 导入**、session-bound 导出、完整 reasoner、
+    （已部署+HTTP 验证）；GX-APP-063 已在 WORKTREE 补齐 **用户材料 → Document/Ontology Draft → 显式发布**，下一切片补 DSH 丰富提炼、OCR、session-bound 导出、完整 reasoner、
     部署注册管理与认证 broker。
 4. **W-GENERALIZE-001 · 未见场景泛化验证**：选择一个中等规模、此前未用于开发的场景，禁止新增场景专属
    Python handler；衡量构建成功率、澄清准确性、工具调用/返工次数、Candidate 语义正确性和 Apply 后问答正确性。
