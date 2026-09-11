@@ -5,7 +5,7 @@ schema_version: 1
 
 team:
   name: negentropy
-  version: 0.3.0
+  version: 0.3.1
   description: 以文档和可验证证据为协作介质、以每类事实的权威来源为准的软件开发团队
   protocol: v1.1-docs
   language: zh-CN
@@ -16,6 +16,8 @@ governance:
   concurrency: team/concurrency.md
   workflow_profiles: team/workflow-profiles.md
   validation_command: python scripts/validate_team.py
+  workboard:
+    recent_terminal_limit: 10
 
 # 下列枚举和策略的机器权威来源是本文件；Markdown 只解释语义，不重复拥有定义权。
 

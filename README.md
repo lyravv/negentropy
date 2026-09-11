@@ -4,16 +4,16 @@ negentropy 是一个正在真实项目中使用的、文档可移植且带机器
 
 团队遵循[“最低充分秩序”](team/philosophy.md)：不追求最多角色、最厚文档或最严审批，而以最低持续成本抑制关键漂移。任何流程扩张都应先证明它防止的失败值得其维护成本。
 
-## 当前能力（0.3.0）
+## 当前能力（0.3.1）
 
 - 8 个正式角色：orchestrator、业务、产品、架构、前端、后端、测试、运维；
 - 协议 `v1.1-docs`：文档 + 审批/revision/并发证据；
 - 六种 workflow profile，允许已有规范项目、feature、bugfix、spike 和运维任务按需裁剪；目前 `existing-spec` 已经 GraphX 验证，其余为 beta/experimental；
-- `STATE.md` 负责项目快照，`WORKBOARD.md` 负责写任务认领和 lease；
+- `STATE.md` 负责项目快照，`WORKBOARD.md` 只保留活跃认领和少量近期终态项；校验器提示过期 lease、未收口 revision 和台账膨胀；
 - `team.yaml` 是枚举与审批策略的机器权威来源，`team/governance.md` 解释其语义；
 - `python scripts/validate_team.py` 在工作前后检查结构与活跃项目。
 
-团队定义是 Markdown + YAML，不绑定特定 Agent 框架。`team.yaml` 是受校验的清单和未来编排输入，但 0.3.0 不宣称仅解析 YAML 就能安全自治；实际执行还必须读取治理、项目规则和用户授权。
+团队定义是 Markdown + YAML，不绑定特定 Agent 框架。`team.yaml` 是受校验的清单和未来编排输入，但 0.3.1 不宣称仅解析 YAML 就能安全自治；实际执行还必须读取治理、项目规则和用户授权。
 
 ## 目录
 

@@ -35,13 +35,20 @@
     },
     "governance": {
       "type": "object",
-      "required": ["philosophy", "file", "concurrency", "workflow_profiles", "validation_command"],
+      "required": ["philosophy", "file", "concurrency", "workflow_profiles", "validation_command", "workboard"],
       "properties": {
         "philosophy": {"$ref": "#/definitions/relativePath"},
         "file": {"$ref": "#/definitions/relativePath"},
         "concurrency": {"$ref": "#/definitions/relativePath"},
         "workflow_profiles": {"$ref": "#/definitions/relativePath"},
-        "validation_command": {"type": "string", "minLength": 1}
+        "validation_command": {"type": "string", "minLength": 1},
+        "workboard": {
+          "type": "object",
+          "required": ["recent_terminal_limit"],
+          "properties": {
+            "recent_terminal_limit": {"type": "integer", "minimum": 0}
+          }
+        }
       }
     },
     "statuses": {
