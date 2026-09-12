@@ -2,13 +2,24 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 7.4
-updated: 2026-09-09
+version: 7.8
+updated: 2026-09-12
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
 
 # GraphX · 当前状态与下一步（STATE）
+
+## 2026-09-12 用户试用后：统一聊天角色逻辑
+
+用户已确认设计并要求实施，当前优先于泛化实验。设计说明：
+`graphx/docs/product/chat-role-coordination.md`。
+入口由每条消息的 @ 决定；默认 GraphX；Add resource 仅增加开场白。
+角色充分回答后 GraphX 静默结束，后台协调保留 Trace。Build Mode 控制变更工具，
+不再禁止只读角色会话；委派继承权限。此轮已部署到 8001（PID 1467662），
+3 个 Graph ID 与 2 个 Workspace 资源保留。74 项专项测试、3 项前端测试及构建通过；
+真实模型专项 `chat-finish-check-fc846e2f8d` 返回 finish + silent=true。
+验收关注 Resource Manager 回答不重复、关闭模式只读角色可用、变更工具被拒绝。
 
 > **本文件只放"项目内容"**（我们在哪 + 下一步 + 项目专属约束）。
 > **团队能力**（Bootstrap 顺序 / 收尾清单 / 团队级约束 / STATE.md 约定）的单一事实源在
@@ -23,15 +34,52 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项 | 值 |
 |---|---|
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.9 WORKTREE** |
-| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `0939e8d`，已推送 origin） |
+| 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `76d9220` + Reviewer 全部整改 WORKTREE；未提交、未部署） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
 | 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
-| 团队 | negentropy（8 角色，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
-| 当前阶段 | **上下文式引用体验 DONE**：Standalone 引用按钮与含义不清的 Import to Graph 已移除；Resource/MySpace 文件与选中文本/Canvas 节点、边、超边统一从对象右键加入对话 |
-| 测试状态 | Resource Manager/作用域/资源中心与运行时专项 56 passed + 14 subtests；上下文式引用相关回归 18 passed，前端 production build、Python compile、diff check 通过；真实 Harness 文件选段 smoke 已验证精确语义命中与 selector 隔离；完整 conformance 仍受既有 TestClient 后台等待问题影响，不声明全量通过 |
+| 团队 | negentropy（9 角色，含独立 Reviewer，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
+| 当前阶段 | **W-GENERALIZE-001 IN_PROGRESS**：Reviewer 整改与防回归增强已完成；全新设备维保场景及评分口径已冻结，确定性通用能力 preflight 通过，下一阶段运行真实角色 runtime |
+| 测试状态 | Node tests 1 file/3 cases passed；前端 production build 通过；Python 核心 46 passed + 14 subtests、runtime/spec 28 passed，新增专项组合 27 passed；仓库规约 unittest baseline 12 passed；compile、requirements JSON、diff check 通过。更宽旧 pytest 集合仍有既有后台等待卡住，不声明全量通过 |
 | 真实运行证据 | 两个完整语义场景已通过团队构建并 Apply；30 问题隔离运行 30/30 HTTP 完成，最终三个编排缺陷已定向修复；仍有 2 个 Graph 覆盖缺口、2 个历史 golden 漂移、2 个代理/数据质量限制。**W-GENERIC-SEM-001F 已无清库部署到 8001（main PID 1320551）并验证**：旧连接/准入自动提升为 WorkspaceResource+Binding（connection_id 保持），active `123` 5 节点仍可解析；临时 Graph 上 HTTP 闭环 create→test→bind→unbind→delete-protect→delete 全部通过，生产 3 Graph 无损 |
-| 运行应用 | 8001 为 0.5.9 WORKTREE（PID 1769144），健康；4 Graph、9 Workspace resources、11 Chat 保留。输入框布局与上下文式引用已部署 |
-| 下一步 | 进入新的未见场景泛化验收，全程禁止新增场景专属 handler |
+| 运行应用 | 本轮未部署、未清数据，也未重新确认 8001 运行态；Reviewer 整改仅存在于本地 WORKTREE，不能把历史部署记录当成当前代码已上线 |
+| 下一步 | 对冻结的 `equipment-maintenance-v1` 执行隔离真实角色 runtime：先由 GraphX 根据目标动态派工，再按实际产物触发所需独立角色；统计工具/返工/澄清与 Candidate 得分。不得预排固定 pipeline 或现场改 fixture/prompt；commit/deploy 仍需另行授权 |
+
+## 2026-09-12 · W-GENERALIZE-001 Phase 1 已冻结
+
+- 无需用户真实数据，采用全合成 `equipment-maintenance-v1`：设备台账、维保工单、维保技术人员、
+  维保班组、备件消耗记录五个目录资源；预先冻结四条仅由字段元数据支持的 association 与四个代表问题。
+- fixture 明确排除订单、客服、WMS、SAP Profile 和 model-visible connection identity；运行前已经固定，后续
+  失败只能分类记录，不能为提高成绩现场修改场景或增加 Python handler。
+- Phase 1 确定性 preflight 证明：`semantic_scenarios=()` 时仍能投影字段角色和四条关联线索，语义操作
+  可以编译五节点四关系 Candidate，模型侧只使用语义名称，服务端再绑定 opaque provenance。
+- 这只是运行前资格检查，不冒充泛化结果。Phase 2 必须让真实 GraphX/独立角色 runtime 面对不变 fixture，
+  记录动态派工、澄清、工具调用、返工、Candidate、Review/Test 与问答评分。
+
+## 2026-09-12 · W-REVIEW-HARDEN-001 已完成
+
+- Prompt Profile 增加性质测试：改变 objective/history 会改变渲染后的每轮 prompt，但不改变稳定
+  `prompt_digest`；改变稳定 instructions 或 version 必须改变 digest。
+- 前端角色 ID、显示 label、mention aliases、解析器和 UI 角色按钮由 `entryMention.ts` 的同一份
+  `ROLE_DEFINITIONS` 派生；新增角色不再同时维护 TypeScript union、正则、显示映射和按钮数组。
+- GX-APP-075 的旧 API catalog 修复加入单 Service 临界区；同一资源并发显式 test 不会重复扫描、
+  重复写入确定性 operation ID 或向用户暴露事务冲突。规范、manifest 与映射测试保持闭环。
+- 该短前置没有改变角色心智、资源授权、Candidate/Apply 或 wire contract。下一主任务直接进入
+  `W-GENERALIZE-001`，结构性拆分继续保持渐进式后置。
+
+## 2026-09-12 · Negentropy Reviewer 整改收口与下一步
+
+- Reviewer 首轮识别的五项问题已经全部处理：四个独立角色统一回交 GraphX observation；入口 mention
+  解析/清理由单一运行时模块负责并有真实连续切换测试；应用初始化不再扫描外部 OpenAPI；两条不可达
+  legacy pipeline 及其无调用 Service 构造依赖删除；五角色 Prompt Profile 具名、版本化，稳定 digest 与
+  动态任务上下文分离，通用 GraphX prompt 不再无条件注入订单/WMS/SAP 场景。
+- `04-implementation/code-review.md` v0.3 是 Negentropy Reviewer 的独立复核记录，结论为
+  **原审查项全部关闭、复审通过、无阻塞发现**。文档按角色协议保持 `IN_REVIEW`，不冒充产品批准或发布授权。
+- 下一工程切片 `W-REVIEW-HARDEN-001` 已完成三项防回归增强：Prompt digest 性质测试、前端角色定义
+  单源化、API catalog 并发幂等测试；未扩大为产品重构。
+- 随后的主线是用一个全新、未见的中等复杂场景验证 GraphX 的动态派工、资源使用、Candidate →
+  独立 Review/Test → 用户 Apply 与问答闭环。失败按产品能力分类，不现场增加场景专属 handler。
+- `ResourceCatalogService`、`ChatOrchestrator`、`useChatTurn`、`ResourceConnectionForm` 的渐进抽取仍是结构性建议；
+  只在后续触碰对应边界时小步实施，不以一次性 monolith 重写阻塞泛化验收。
 
 ## 项目批准者
 
@@ -73,7 +121,7 @@ GraphX 不是一个针对固定问题集编写查询函数的问答应用。它�
 | 层级 | 结论 | 已有证据 |
 |---|---|---|
 | HGT 与控制面 | 基本成型 | Bundle/Patch、不可变 Revision、Candidate、Review/Test、用户 Apply、typed receipts、诊断与权限门禁均已实现 |
-| Agent 构图团队 | 已跑通 Alpha | GraphX/Builder/Reviewer/Tester 独立 Harness、语义工具、动态任务图、关系验证和两次正式场景 Apply 已验证 |
+| Agent 构图团队 | 已跑通 Alpha | GraphX/Resource Manager/Builder/Reviewer/Tester 独立 Harness、语义工具、动态任务图、关系验证和两次正式场景 Apply 已验证；GraphX 负责任务分派，不存在写死 pipeline |
 | 数据可执行性 | 已跨过“空壳图”阶段 | Graph-owned connection/catalog、节点来源绑定、Candidate Preview/Revision 受控 SQL 与 relation check 可用 |
 | 工作台体验 | 已具备大图基础 | 超边实体、力导向拖拽、全屏/小地图、搜索聚焦、一跳高亮和可扩展成员选择已交付 |
 | 业务问答 | 当前场景可用，但尚未证明通用 | 30/30 HTTP 完成，关键语义缺陷已修复；部分能力依赖 `question_executor.py` 的服务端确定性 Profile |
@@ -420,9 +468,9 @@ rc6 冒烟 `completed`，服务保留 Graph `111` 和 1 个连接。
 用户已批准以下不可变边界：
 
 1. GraphX 是无 mention 时的唯一默认入口；不使用关键词/意图枚举预路由到固定 pipeline。
-2. Build Mode 仅是能力授权：关闭时只能激活 GraphX，不能创建其他角色会话、Candidate 或修改 Graph；开启时才允许 GraphX/用户激活 Builder、Reviewer、Tester。
-3. 用户可在群聊中 `@GraphX`、`@Builder`、`@Reviewer`、`@Tester`；指定角色完成后触发一次 GraphX Supervisor turn，由 GraphX 决定静默结束、汇总、澄清或继续委派。
-4. Builder、Reviewer、Tester 是目的和工具权限不同的独立 Agent，不是固定阶段；允许 Builder↔Reviewer 返工循环、Tester 先审计当前 Graph 后触发 Builder、并行任务等动态任务图。
+2. Build Mode 仅是能力授权：关闭时只能激活 GraphX；开启时才允许 GraphX/用户激活 Resource Manager、Builder、Reviewer、Tester，并允许产生受控的资源或 Candidate 变更。
+3. 用户可在群聊中 `@GraphX`、`@Resource Manager`、`@Builder`、`@Reviewer`、`@Tester`；没有 mention 时由 GraphX 判断交给谁。指定角色完成后统一触发一次 GraphX Supervisor observation，由 GraphX 决定静默结束、汇总、澄清或继续委派。
+4. Resource Manager、Builder、Reviewer、Tester 都是目的和工具权限不同的独立 Agent，不是固定阶段或写死 pipeline；允许按目标动态派工、返工、先审计后构建或并行执行。Resource Manager 不天然从属于 Graph 构建流程。
 5. 上下文采用 Harness/Codex 风格的共享任务上下文 + 独立角色 session/workspace/checkpoint；角色间只共享公开消息、受控 Context Pack 与 typed artifact，不共享隐藏推理或私有 session。
 6. SQL/Graph/File/外部系统能力全部作为 Harness plugin 或 MCP 风格工具进入统一 Tool Gateway；删除主链路上的 SQL 问句识别和关键词 route。
 7. Apply 永远由用户明确确认；动态 Agent 也不得直接写正式 Graph revision。
