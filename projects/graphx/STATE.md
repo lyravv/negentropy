@@ -2,13 +2,94 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 7.8
-updated: 2026-09-12
+version: 8.4
+updated: 2026-09-14
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
 
 # GraphX · 当前状态与下一步（STATE）
+
+## 2026-09-14 当前迭代：个人工作台 AI Manage
+
+本节优先于下方历史计划。用户明确 GraphX 是个人产品，不是多租户平台；
+历史 W-PLATFORM-001 的 tenant/org 平台路线不再是本产品下一步，不据其启动开发。
+本轮用户要求 Negentropy 团队按“设计 → 需求 → 开发 → 验收”推进，先落地 AI Manage，
+Applications 仅一级导航占位，不做应用构建、运行或发布。Graphs / Resources 保持现有能力。
+
+- profile：`feature`；用户明确的前置交互设计先于需求整理，正式技术契约仍在需求评审后冻结。
+- 权威代码：`graphx` 分支 `feat/trusted-build-core`，HEAD `bd15e9886a6180519f2912881ce28c297d4aead9`；接手时 clean。
+- 规范仍以 `graphx/spec/` 为准；新设计尚未批准，不能将设计意图宣称为已实现。
+- 用户/产品批准者：`project-owner=user`、`product-owner=user`。用户已确定模块范围；新增细节由需求稿明确提交确认，不伪造批准。
+- 设计：`03-architecture/ai-manage-design.md` v0.3（APPROVED）。
+- 需求：`02-requirements/ai-manage-requirements.md` v0.3、`ai-manage-iteration-plan.md` v0.2 及五个 US-AIM 用户故事（APPROVED）。
+- AI Manage 聚焦模型配置、LLM 用量统计、执行日志；复用任务 Trace，不另做一套摘要报告。
+- 当前工作授权为 scoped implementation，设计阶段仅文档；未获本轮提交、部署、push 授权，不改线上数据和密钥。
+- 2026-09-14 验证：`UV_CACHE_DIR=/tmp/graphx-uv-cache uv sync --offline` 成功；
+  `UV_CACHE_DIR=/tmp/graphx-uv-cache uv run --offline python -m unittest discover -s tests -v` 输出 12 tests OK，
+  但执行会话尚未返回退出码；仅记录测试输出，不声称该进程已正常退出。
+  `python scripts/validate_team.py --project graphx`：0 errors、6 项历史 warnings；未执行新功能验收或重新核验部署状态。
+- 设计及需求已交付 v0.1 IN_REVIEW；独立测试角色只读评审结论为无阻塞提交用户确认，
+  不是新功能测试通过。评审要求明确测试凭据复用/新目标保护、部分 usage 的未知计数与字段覆盖率。
+- 用户随后要求“继续吧”，Q-AIM-001 范围已确认推进；需求已记录批准证据。下一步由架构角色冻结正式契约，
+  后端/前端开发、测试角色独立验收。Q-AIM-002 为 pinned DSH 请求观测技术门禁，实施时必须有真实证据。
+- 暂未开发、提交或部署 AI Manage。本轮草案选择单默认配置、整树快照、连接测试、逐请求用量、只读日志；
+  多配置/角色覆盖、费用与破坏性日志清理均是后置建议，不冒充用户已批准。
+- 2026-09-14 续接（orchestrator）：AI Manage 后端（配置/快照/连接测试/日志/用量）与前端（三 tab+占位）已在
+  `graphx` WORKTREE 实现并通测（`tests/conformance/test_ai_management_backend.py` 6 passed、前端 `apps/web/tests/aiManage.test.mjs` 5 passed、production build 通过）；
+  用量采集按 Q-AIM-002 门禁保持诚实 `unavailable/partial`，不冒充完整统计（GX-APP-083 仍 planned）。
+  已修复基线：`test_spec_contract` 曾因 GX-APP-080..084 未在 `spec/03-domain-invariants.md` 声明而 red，
+  现已补充声明并为未实现项补齐 `planned_test` 说明。
+  又修复 WORKTREE 前端回归：`ResourceCenter` 曾重复内联与 `GlobalWorkspaceFrame` 相同的工作台 rail
+  （多出一个 `<WorkspaceGraphControl>`），导致 `test_workspace_resources_are_a_peer_page_and_graph_binding_is_separate` red；
+  已改为 `ResourceCenter` 复用 `GlobalWorkspaceFrame`，删除重复 rail，并把陈旧 FE conformance 断言更新为组件化
+  导航架构；`test_workbench_frontend.py` 新增通过 `test_ai_manage_and_applications_are_peer_workspace_destinations`。
+  最终 `uv run --offline python -m unittest discover -s tests` 12 tests 全绿；AI 后端 conformance 6 passed、
+  FE conformance 12 passed、前端 production build 通过、`git diff --check` 通过。
+  GX-APP-080/081/082/084 已 conformance-wire 置 `implemented`（manifest 对应 flag 同步为 true）；
+  GX-APP-083 保持 `planned`，唯一阻塞为 Q-AIM-002。
+  仍为 WORKTREE（未 commit）；AI Manage 目前端已完成 `vite build` 并在用户授权下经 `redeploy_alpha.sh` 部署到 8001（未清库），
+  后端 AI 四路由已验证可用；下一步可据契约 v0.2 APPROVED 由独立测试角色收口 AI Manage 验收报告。
+- **2026-09-14 已交付上线：多模型配置库，无"默认"概念**。用户最终明确：**没有默认**；每条消息发送时选一个模型，就是用它跑，下一条可换。
+   WORKTREE 已实现并部署（`redeploy_alpha.sh`，PID 2009718，保留数据）：
+   - 后端多条目库：`GET/POST /api/v1/alpha/ai/configs`、`PUT /api/v1/alpha/ai/configs/{id}`、
+     `POST .../configs/{id}/default`、`DELETE .../configs/{id}`；`/ai/config` 保持默认别名。
+     每条目独立版本；删除唯一默认受阻（409 `AI_CONFIG_DELETE_DEFAULT`）；连接测试按条目版本校验、不落库；
+   - 前端：AI Manage 模型页改为**配置条目列表**（新增/编辑/名称/路由/模型/Base URL/设默认/删除）；
+     GraphX 输入栏增加**模型下拉**（选定→`POST default` 设为全局默认）。
+     说明：新增条目**非自动默认**，需单独“设为默认”或用输入栏切换（区隔更清晰，避免静默改默认）；
+   - 快照绑定 `config_id+version`；凭据仍服务端隔离、不回流浏览器。
+   - 测试：AI conformance 10 passed（+3 多配置）、前端 node 9 passed、spec-contract 通过、build 通过；live 已验证创建/列表/设默认/更新版本(409)/删除保护 全通。
+   GX-APP-085 新增置 `implemented`，manifest/handoff 同步；GX-APP-083 仍 planned（Q-AIM-002）。
+   非本迭代回归：`test_graph_delete / workspace_resource_center / tool_first_graph_operations` 3 个在 WORKTREE 基线即因 workspace-resource 复用语义 red，与 AI 无关。
+
+- **2026-09-14 再修正（最终语义，覆盖上方默认实现）：移除全部"默认"概念并重新部署 8001（PID 2277393）**。用户要求：没有默认；每条消息发送时选哪个模型就用哪个。
+   - 后端移除 `POST /configs/{id}/default`、`PUT /config`、`active/default` 及删除默认保护逻辑；删除 API 改为普通删除。`GET /ai/config` 保留旧别名（仅回退部署值，不含 default）。
+   - 发送消息在 `ChatRequest.config_id` 显式带所选模型，根任务快照绑该 config_id+version（source=user_selected）、子树继承；未选模型拒发（AI_CONFIG_REQUIRED）。
+   - 前端：AI Manage 模型页=条目库（新增/编辑/删除/测试，无"默认"徽标）；GraphX 输入栏模型下拉=本消息所选，未选不能发送。
+   - 已从 live 删除预置"部署默认"条目（库现为空，由用户新增）。测试全绿（AI 10 / node 9 / spec-contract / workbench 12），e2e 验证 无config拒发、带config接受并绑快照。GX-APP-085 语义改为"逐消息选模型，无默认"。
+   - 2026-09-14 架构收口：需求 v0.3、US-AIM-005 v0.2、设计/契约 v0.3 和 GraphX GX-APP-081/085 已统一为该最终语义；旧多模型默认方案标记 SUPERSEDED。发现当前前端仍在加载列表时自动选中第一条作为 composer 模型，此行为等价于隐式默认，违反 v0.3，进入实现修复与独立验收门禁。
+
+- **2026-09-14 独立验收收口（优先于本节上方过程记录）**：A 切片已通过，报告为
+  `05-testing/ai-manage-test-report.md` v0.1 APPROVED。已修复并复验 composer 隐式首选、非空 SQLite
+  迁移、活动旧任务树 `legacy_recovery`、worker 凭据协议和跨目标凭据隔离。常规 pytest 48 项、
+  pinned DSH rc6 本机回环真实路径 1 项、Web 9 项及 production build 均通过；所选 Base URL、
+  model、Bearer Authorization 已在真实路径生效且不泄漏 secret。当前 WORKTREE 未提交、未部署，
+  8001 现未监听。A 切片可进入本地体验；真实逐请求/token 用量仍受 Q-AIM-002 阻塞，
+  `llm_request_usage_accounting` 保持 false，不得描述为完整首版可发布。
+
+- **2026-09-14 UX 追加收口**：模型配置页已移除“当前在用”运行语义；Graph 非 active 卡与
+  其他一级入口统一为 54px 视觉 primitive；模型选择迁入增高 composer 内部底栏右侧，
+  无配置时保留“配置模型”入口。Web 9 项及 production build、GraphX 前端/规范 pytest
+  13 项、diff check 均通过。详见独立验收报告 v0.2。仍为 WORKTREE，未提交、未部署。
+
+- **2026-09-14 最终交付状态（覆盖上述过程记录）**：AI Manage A 切片、Applications 占位、
+  逐消息显式模型选择、原始 Task Trace 及本地 OpenAI-compatible 连接路径已完成。
+  凭据目录已移出代码仓并支持旧路径迁移；重新部署不再从旧进程继承代理或硬编码模型主机，
+  仅使用当前服务器环境的 proxy/no_proxy。用户配置的 `qwen3.6-27b` 连接测试已实际成功。
+  最终回归：Python 49 passed，Web 9 passed，production build 通过，`git diff --check` 通过。
+  8001 当前为 `graphx-alpha.service` active/running（PID 2709544）。LLM usage 仍按契约返回
+  `unavailable/partial`，不虚报完整 token 统计。本轮已获用户“整理并提交”授权。
 
 ## 2026-09-13 最新续接：应用后业务验收
 
@@ -59,12 +140,12 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 项目 | GraphX（Graph-first 可追溯超图工作台），产品版本 **0.5.9 WORKTREE** |
 | 代码仓库 | `/home/wangling/develop_team/graphx`（分支 `feat/trusted-build-core`，HEAD `76d9220` + Reviewer 全部整改 WORKTREE；未提交、未部署） |
 | 规范事实源 | `/home/wangling/develop_team/graphx/spec/`（APPROVED，**单一事实源**，覆盖一切历史聊天/原型） |
-| 工作流 | `existing-spec`（阶段 1–3 由 `graphx/spec/` 的精确 revision 替代） |
+| 历史工作流 | existing-spec（历史阶段 1–3 由 `graphx/spec/` 替代；当前迭代以顶部 feature 说明为准） |
 | 团队 | negentropy（9 角色，含独立 Reviewer，协议 `v1.1-docs`），定义在 `/home/wangling/develop_team/negentropy` |
 | 当前阶段 | **W-GENERALIZE-001 IN_PROGRESS**：Reviewer 整改与防回归增强已完成；全新设备维保场景及评分口径已冻结，确定性通用能力 preflight 通过，下一阶段运行真实角色 runtime |
 | 测试状态 | Node tests 1 file/3 cases passed；前端 production build 通过；Python 核心 46 passed + 14 subtests、runtime/spec 28 passed，新增专项组合 27 passed；仓库规约 unittest baseline 12 passed；compile、requirements JSON、diff check 通过。更宽旧 pytest 集合仍有既有后台等待卡住，不声明全量通过 |
 | 真实运行证据 | 两个完整语义场景已通过团队构建并 Apply；30 问题隔离运行 30/30 HTTP 完成，最终三个编排缺陷已定向修复；仍有 2 个 Graph 覆盖缺口、2 个历史 golden 漂移、2 个代理/数据质量限制。**W-GENERIC-SEM-001F 已无清库部署到 8001（main PID 1320551）并验证**：旧连接/准入自动提升为 WorkspaceResource+Binding（connection_id 保持），active `123` 5 节点仍可解析；临时 Graph 上 HTTP 闭环 create→test→bind→unbind→delete-protect→delete 全部通过，生产 3 Graph 无损 |
-| 运行应用 | 本轮未部署、未清数据，也未重新确认 8001 运行态；Reviewer 整改仅存在于本地 WORKTREE，不能把历史部署记录当成当前代码已上线 |
+| 运行应用 | AI Manage 已部署到 8001（`redeploy_alpha.sh`，2026-09-14，用户授权 publish）并已验证：`/api/v1/alpha/ai/{config,config/test,logs,usage}` 全部可用；`config` 返回真实部署配置（local / `DeepSeek-V4-Flash-0731` / none）、`logs` 返回近 7 日跨 Graph 任务分页索引、`usage` 按 Q-AIM-002 诚实返回 `unavailable`。保留既有 Graph/数据，未清库。其余 reviewer/泛化整改仍为本地 WORKTREE、未 commit |
 | 下一步 | 对冻结的 `equipment-maintenance-v1` 执行隔离真实角色 runtime：先由 GraphX 根据目标动态派工，再按实际产物触发所需独立角色；统计工具/返工/澄清与 Candidate 得分。不得预排固定 pipeline 或现场改 fixture/prompt；commit/deploy 仍需另行授权 |
 
 ## 2026-09-12 · W-GENERALIZE-001 Phase 1 已冻结
@@ -127,7 +208,7 @@ downstream: [任何被要求"继续 graphx 开发"的 agent]
 | 6 发布 | devops-engineer | **DONE（当前里程碑）** | `fa351ce` 已本地提交并 **push** `origin/feat/trusted-build-core`；8001 已无清库重部署、迁移与 HTTP 闭环验证通过 |
 | 7 复盘 | orchestrator | **DONE** | 2026-09-03 完成第二次项目级复盘：从场景正确率优化转向通用构图产品化 |
 
-> 说明：阶段 1–3 按 `existing-spec` 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
+> 历史说明：阶段 1–3 当时按 existing-spec 合法裁剪为 `SKIPPED`，由 `graphx/spec/` 的当前 revision 替代
 > （`spec/` 是单一事实源）。本工作区只承载团队协作文档（notes/测试三件套/问题登记），不复制规范。
 
 ## 当前产品判断与新路线（2026-09-03）
