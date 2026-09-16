@@ -8,6 +8,16 @@ updated: 2026-08-21
 
 # GraphX · WORKBOARD
 
+## 2026-09-16 同步（补记）——角色本地 AGENTS 与渐进式本体 Skill
+
+- W-GRAPHX-ROLE-ONTOLOGY：GraphX `fe42447`（角色配置单一权威化）+ `3bc42c8`（角色本地 AGENTS.md、
+  渐进式 `.skills/ontology-build/SKILL.md`、typed Ontology 草稿构造）已部署；重启验证 16:18 CST，
+  `/health` ok。在 `89f6f96` 同步之后新增的两笔增量，本次补记。
+- 验证：cleanup 回归 85 测试 + 14 subtests、role-configuration 6 测全过；wheel 含 5 个 AGENTS.md 与
+  role-local SKILL.md。未声明全量通过（更宽旧集合仍有既有后台等待卡住）。
+- 边界/后续：测试≠live-LLM 合规证明；**真实多轮 Ontology 场景验收待做**；DAG 测试缺 `config_id`
+  已补夹具（15 处）但全回归未绿；LLM usage 仍 unavailable。不开发 Applications、不拓多租户。
+
 ## 2026-09-16 同步
 
 - W-GRAPHX-SUPERVISOR-CLEANUP：实现已提交 GraphX `89f6f96`；移除 Build Mode 产品入口与双 GraphX 提示词，
@@ -21,6 +31,7 @@ updated: 2026-08-21
 
 | ID | 标题 | 状态 | Owner | Mode | Base revision | 写入范围 | 依赖 | Claimed at | Lease until | 验收 | Result revision / Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
+| W-GRAPHX-ROLE-ONTOLOGY-001 | 角色本地 AGENTS + 渐进式本体 Skill + typed Ontology 草稿 | DONE | orchestrator | implement | graphx `89f6f96`（上轮 supervisor 同步后）；分支 `feat/trusted-build-core` | graphx src/graphx_core/roles/(agents/*/AGENTS.md、*.py)、config/harness/roles.json、config/resource-manager/skills.json、scripts/export_role_config.py、src/graphx_core/ontology_draft.py、spec/{05,06}/manifest/conformance、相关 tests | 承接 89f6f96 supervisor-cleanup | 2026-09-16T15:00+08:00 | 2026-09-16T23:59+08:00 | cleanup 回归 85 测试+14 subtests、role-config 6 测全过；wheel 含 5 AGENTS.md + role-local SKILL.md；不宣称全量 pytest | graphx `fe42447`+`3bc42c8`；已部署 09-16 16:18 CST、/health ok、86 测试+14 subtests；未声明全量（更宽旧集合后台等待卡住）；真实多轮场景验收待做；LLM usage 仍 unavailable |
 | W-AIM-BE-001 | AI Manage 后端 A 切片与诚实 usage 投影 | DONE | backend-engineer | implement | graphx bd15e9886a6180519f2912881ce28c297d4aead9；contract v0.3 APPROVED | graphx src/graphx_alpha/{ai_management.py,entities.py,schemas.py,api.py,service.py,harness_executor.py}；src/graphx_core/deepseek_adapter.py；scripts/deepseek_harness_worker.py；后端专项 tests | W-AIM-CONTRACT-001；B 完整采集受 Q-AIM-002 | 2026-09-14T14:50+08:00 | 2026-09-14T19:30+08:00 | 配置真实生效/快照/secret/连接测试/logs；usage 缺证据不虚报；专项测试 | WORKTREE；A 切片独立验收通过；真实 DSH 回环验证 endpoint/model/auth；legacy recovery、非空迁移及凭据隔离通过；usage 仍 unavailable；未提交部署 |
 | W-AIM-FE-001 | AI Manage 前端与 Applications 占位 | DONE | frontend-engineer | implement | graphx bd15e9886a6180519f2912881ce28c297d4aead9；contract v0.3 APPROVED | graphx apps/web/** | W-AIM-CONTRACT-001；消费已批准 DTO | 2026-09-14T14:50+08:00 | 2026-09-14T19:30+08:00 | 四导航一致；三tab；配置/usage/logs状态；复用Trace；frontend tests/build | WORKTREE；无隐式默认；成功消息后清空选择、失败保留重试；Web 9 passed、production build通过；未提交部署 |
 | W-AIM-CONTRACT-001 | AI Manage 首版接口与数据契约 | DONE | architect | draft | graphx bd15e9886a6180519f2912881ce28c297d4aead9；用户无默认最终决定；AI Manage 需求 v0.3 | projects/graphx/03-architecture/ai-manage-contract.md；ai-manage-design.md；GraphX GX-APP-081/085 | 用户 2026-09-14 最终明确无默认、逐消息选择 | 2026-09-14T14:36+08:00 | 2026-09-14T18:30+08:00 | 多配置/逐消息选择/整树快照/凭据/usage/分页一致；消费者无需猜默认 | WORKTREE；契约 v0.3 APPROVED；旧默认草案 SUPERSEDED；发现 composer 自动首选项违反契约，交实现与测试修复；未提交部署 |

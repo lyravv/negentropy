@@ -2,13 +2,39 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 8.5
+version: 8.6
 updated: 2026-09-16
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
 
 # GraphX · 当前状态与下一步（STATE）
+
+## 2026-09-16 最新同步：角色本地 AGENTS 与渐进式本体 Skill（已部署）
+
+本节优先于下方历史记录。GraphX 提交已推进到 `3bc42c8`（分支 `feat/trusted-build-core`），
+在上一条"统一 GraphX Supervisor"（`89f6f96`）之后新增两笔增量并已通过
+graphx-alpha.service 部署、重启验证 16:18:29 CST、服务 active/running、`/health` 返回 ok。
+
+- `fe42447` Centralize role configuration：`src/graphx_core/roles/` 成为角色 prompt、
+  工具 ceiling 与执行入口的唯一权威；`config/harness/roles.json` 由 `scripts/export_role_config.py`
+  导出；Harness/Policy/网关消费同一注册表；`prompt_profiles.py` 近 300 行迁移为兼容别名。
+- `3bc42c8` Introduce role-local agents and progressive ontology skills：
+  每个角色新增 `roles/agents/<role>/AGENTS.md`；Resource Manager 的 `.skills/ontology-build/SKILL.md`
+  （渐进式 `skill(name)` 经由既有授权网关装载，其他角色不能加载）；`config/resource-manager/skills.json`
+  从生成快照转为 role-own；`ontology_draft.py` 支持 typed 本体草稿（concepts/relations/规则/evidence），
+  端点和引用服务端核验，完整内容进 preview 并参与 artifact hash；原生 DSH 全局 skill 发现关闭。
+- System Graph 保护、工具授权、Candidate 校验与用户 Apply 确认保持；Applications 仍仅占位。
+- 验证：本次部署后 cleanup 回归套件 85 测试 + 14 subtests，补测 6 个 role-configuration 全部通过
+  （合计 = 之前 handoff 的 86 测试 + 14 subtests）；wheel 打包确认 5 个 AGENTS.md 与 role-local SKILL.md
+  均纳入。未声明全量 pytest 通过（更宽旧集合仍有既有后台等待超时）；不进 Git 的内容（密钥/语料/代理）
+  仍保持 Git 外。
+- 关键边界：以上测试不构成 live-LLM 路由合规证据；**真实多轮 Ontology 场景验收仍未做**，
+  留待下一轮优化。上一条同步提到的 9 项 dynamic-agent-task-graph 旧测试缺 `config_id` 问题，
+  经 `fe42447` 对测试夹具补 `config_id`（当前 15 处引用）已着手修复，但任务 DAG 与 Candidate Review/Apply
+  完整回归 + 部署后真实资源构图/审查/Apply 场景验收仍未跑绿、未全部通过。
+- 下一步：真实多轮 Ontology 场景（资源 → 构图 → 审查 → Apply）验收；完善 LLM usage 采集（仍沿用
+  既有 unavailable 未完成状态）；不开发 Applications，不拓展多租户。
 
 ## 2026-09-16 最新同步：统一 GraphX Supervisor
 
