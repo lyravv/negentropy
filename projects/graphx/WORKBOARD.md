@@ -8,6 +8,15 @@ updated: 2026-08-21
 
 # GraphX · WORKBOARD
 
+## 2026-09-16 同步
+
+- W-GRAPHX-SUPERVISOR-CLEANUP：实现已提交 GraphX `89f6f96`；移除 Build Mode 产品入口与双 GraphX 提示词，
+  清理跨角色只读兜底，统一资源表单优先，补当前 Candidate Review 门禁及中文提示词注释。
+- 验证：本次 45 项定向测试及 Web 构建通过。扩大回归仍有 9 项旧测试缺模型配置，验收未全绿。
+- 后续：更新 DAG 测试模型夹具并复验，然后部署和场景验收；不开发 Applications，不拓展多租户。
+- 本轮仅同步项目进度；未修改或代为提交其他 agent 的团队定义、Reviewer 模板和审查草稿。
+
+
 > 本文件在团队 0.3.0 迁移时建立。迁移时两个仓库均已有用户工作树修改，因此没有替现有任务补造 owner 或 lease；开始下一项写任务前先核对并正式认领。
 
 | ID | 标题 | 状态 | Owner | Mode | Base revision | 写入范围 | 依赖 | Claimed at | Lease until | 验收 | Result revision / Notes |

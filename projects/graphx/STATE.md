@@ -2,13 +2,30 @@
 title: GraphX 项目当前状态与下一步（STATE · 项目内容）
 role: orchestrator(维护)
 status: ACTIVE
-version: 8.4
-updated: 2026-09-14
+version: 8.5
+updated: 2026-09-16
 upstream: [graphx/spec/06-testing-and-handoff.md]
 downstream: [任何被要求"继续 graphx 开发"的 agent]
 ---
 
 # GraphX · 当前状态与下一步（STATE）
+
+## 2026-09-16 最新同步：统一 GraphX Supervisor
+
+本节优先于下方历史记录。GraphX 提交 `89f6f96`，分支 `feat/trusted-build-core`。
+用户授权同步进度并提交、推送；本次不部署，不修改线上数据。
+
+- Graphs 移除 Build Mode，统一完整构建能力；旧请求字段继续兼容但不再切换工作模式。
+- 删除 `GRAPHX_READ_ONLY` 与 Harness `chat()`；所有 GraphX 模型任务统一 Supervisor，离线回复保持确定性。
+- Resource Manager 不再兼任其他角色的只读入口；数据库/API 明确先请求安全配置表单。
+- 提示词补充中文审阅注释；版本绑定的 Candidate 缺少当前 Review 时不允许提前结束协调。
+- System Graph 保护、工具授权、Candidate 校验与用户 Apply 确认保留。Applications 仍仅占位，后续限制由服务端能力控制。
+- 本次复验：Harness/入口/路由/聊天 UI/前端契约 45 passed，Web production build 通过。
+  上轮扩大回归合计 47 passed、9 failed；9 项位于 dynamic-agent-task-graph，因旧测试未传 `config_id`
+  报 `AI_CONFIG_REQUIRED`，尚未进入角色执行。不得据此宣称全量验收通过。
+- 下一步：修复上述测试夹具（不弱化产品模型选择要求），重跑任务 DAG 与 Candidate Review/Apply 回归；
+  然后部署并用真实资源配置、构图、审查、Apply 场景验收。LLM 完整用量采集仍沿用既有未完成状态。
+
 
 ## 2026-09-14 当前迭代：个人工作台 AI Manage
 
