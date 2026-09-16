@@ -4,6 +4,17 @@
 > 项目变更记在各项目工作区；这里只记"团队怎么变的"。
 > 格式：日期 · 类型 · 变更 · 原因。类型：`role` 角色 / `workflow` 流程 / `protocol` 协议 / `template` 模板 / `skill` 技能 / `other`。
 
+## [0.3.2] - 2026-09-11
+### Added
+- `role`：新增第 9 个正式角色 `reviewer`（代码审查员），按需审查代码可读性、复杂度、冗余与失效代码，强制执行最低充分代码。含 `team/roles/reviewer/{AGENT.md,skills.md}` 与 `team/templates/code-review.md` 模板。
+- `workflow`：明确 reviewer 为**按需唤醒**角色（`on_demand: true`），不是每次变更的强制门禁——只有用户/项目负责人明确要求 review 时才由 orchestrator 路由执行，避免无谓消耗 token 与上下文。登记于 `team.yaml#roles.stages=[4]`，作为 stage 4 的可选独立审查者，不参与固定门禁。
+
+### Changed
+- `team.yaml`：`team.version` 升到 `0.3.2`；roles 增加 reviewer；stage 4 的 owner 追加 reviewer（并行条件保留 `conditional`）。
+
+### Migration
+- GraphX 等现有项目不强制接入 reviewer；除非用户要求，不改变任何 project 的既有流程与 STATE/WORKBOARD 单点。
+
 ## [0.3.1] - 2026-08-25
 ### Added
 - `other`：validator 增加过期 lease、无法解析的 lease、`DONE + WORKTREE` 未收口和终态行过量 warning；同类结果聚合输出，避免提示本身制造上下文噪声。

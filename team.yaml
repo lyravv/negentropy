@@ -5,7 +5,7 @@ schema_version: 1
 
 team:
   name: negentropy
-  version: 0.3.1
+  version: 0.3.2
   description: 以文档和可验证证据为协作介质、以每类事实的权威来源为准的软件开发团队
   protocol: v1.1-docs
   language: zh-CN
@@ -125,6 +125,17 @@ roles:
     mission: 测试方案、自动化测试、缺陷与回归
     outputs: [05-testing/test-plan.md, 05-testing/defect-log.md, 05-testing/test-report.md]
 
+  - id: reviewer
+    name: 代码审查员
+    entropy: 复杂度熵
+    stages: [4]
+    on_demand: true
+    dir: team/roles/reviewer
+    charter: team/roles/reviewer/AGENT.md
+    skills: team/roles/reviewer/skills.md
+    mission: 按需审查代码可读性、复杂度、冗余与失效代码，强制执行最低充分代码
+    outputs: [04-implementation/code-review.md]
+
   - id: devops-engineer
     name: 运维工程师
     entropy: 运维熵
@@ -151,7 +162,7 @@ workflow:
     - {id: business, stage: 1, owner: business-liaison}
     - {id: requirements, stage: 2, owner: product-manager}
     - {id: architecture, stage: 3, owner: architect}
-    - {id: implementation, stage: 4, owner: [frontend-engineer, backend-engineer], parallel: conditional}
+    - {id: implementation, stage: 4, owner: [frontend-engineer, backend-engineer, reviewer], parallel: conditional}
     - {id: testing, stage: 5, owner: test-engineer}
     - {id: release, stage: 6, owner: devops-engineer}
     - {id: retrospective, stage: 7, owner: orchestrator}
